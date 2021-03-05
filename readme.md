@@ -26,7 +26,7 @@ const cssModulesPlugin = require('esbuild-css-modules-plugin');
 
 esbuild.build({
   plugins: [
-    CssModulesPlugin({
+    cssModulesPlugin({
       localsConvention: 'camelCaseOnly', // optional. value could be one of 'camelCaseOnly', 'camelCase', 'dashes', 'dashesOnly', default is 'camelCaseOnly'
       generateScopedName: (name, filename, css) => string // optional. 
     })
