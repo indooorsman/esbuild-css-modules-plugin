@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './app.modules.css';
+import styles, { css, digest } from './app.modules.css';
 
-export const HelloWorld = () => {
-  return (
-    <h3 className={styles.helloWorld}>Hello World!</h3>
-  );
-};
+export const HelloWorld = () => <>
+  <h3 className={styles.helloWorld}>Hello World!</h3>
+  <code>{digest}</code>
+  <pre><code>{css}</code></pre>
+</>
