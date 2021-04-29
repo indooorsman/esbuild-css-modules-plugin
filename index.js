@@ -36,7 +36,17 @@ const buildCssModulesJS = async (cssFullPath, options) => {
   const jsonStr = JSON.stringify(cssModulesJSON);
   hash.update(cssFullPath);
   const styleId = hash.copy().digest('hex');
-  return `(function(){if (!document.getElementById('${styleId}')) {var ele = document.createElement('style');ele.id = '${styleId}';ele.textContent = \`${result.css}\`;document.head.appendChild(ele);}})();export default ${jsonStr};`;
+  return `
+    (function() {
+      if (!document.getElementById('${styleId}')) {
+        var ele = document.createElement('style');
+        ele.id = '${styleId}';
+        ele.textContent = \`${result.css}\`;
+        document.head.appendChild(ele);
+      }
+    })();
+    export default ${jsonStr};
+  `;
 };
 
 const CssModulesPlugin = (options = {}) => {
