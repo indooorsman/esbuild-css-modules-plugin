@@ -13,6 +13,7 @@ const ensureDir = util.promisify(fs.ensureDir);
 const buildCssModulesJS = async (cssFullPath, options) => {
   const {
     localsConvention = 'camelCaseOnly',
+    inject = true,
     generateScopedName
   } = options;
 
@@ -40,14 +41,16 @@ const buildCssModulesJS = async (cssFullPath, options) => {
     const digest = '${digest}';
     const css = \`${result.css}\`;
 
-    (function() {
-      if (!document.getElementById(digest)) {
-        var ele = document.createElement('style');
-        ele.id = digest;
-        ele.textContent = css;
-        document.head.appendChild(ele);
-      }
-    })();
+    ${inject && `
+      (function() {
+        if (!document.getElementById(digest)) {
+          var ele = document.createElement('style');
+          ele.id = digest;
+          ele.textContent = css;
+          document.head.appendChild(ele);
+        }
+      })();
+    `}
 
     export default ${classNames};
     export { css, digest };
