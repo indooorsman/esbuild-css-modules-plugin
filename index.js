@@ -14,6 +14,7 @@ const pluginNamespace = 'esbuild-css-modules-plugin-namespace'
 const buildCssModulesJS = async (cssFullPath, options) => {
   const {
     localsConvention = 'camelCaseOnly',
+    inject = true,
     generateScopedName
   } = options;
 
@@ -40,7 +41,7 @@ const buildCssModulesJS = async (cssFullPath, options) => {
   return `
 const digest = '${digest}';
 const css = \`${result.css}\`;
-
+${inject && `
 (function() {
   if (!document.getElementById(digest)) {
     var ele = document.createElement('style');
@@ -49,7 +50,7 @@ const css = \`${result.css}\`;
     document.head.appendChild(ele);
   }
 })();
-
+`}
 export default ${classNames};
 export { css, digest };
   `;
