@@ -67,12 +67,18 @@ const CssModulesPlugin = (options = {}) => {
           await writeFile(`${tmpFilePath}.js`, jsContent);
 
           if (outdir && !bundle) {
-            fs.ensureDirSync(outdir);
-            const target = path.resolve(outdir, `${path.relative(rootDir, sourceFullPath)}.js`);
+            const isOutdirAbsolute = path.isAbsolute(outdir);
+            const absoluteOutdir = isOutdirAbsolute ? outdir : path.resolve(args.resolveDir, outdir);
+            const isEntryAbsolute = path.isAbsolute(args.path);
+            const entryRelDir = isEntryAbsolute ? path.dirname(path.relative(args.resolveDir, args.path)) : path.dirname(args.path);
+
+            const targetSubpath = absoluteOutdir.indexOf(entryRelDir) === -1 ? path.join(entryRelDir, `${sourceBaseName}.css.js`) : `${sourceBaseName}.css.js`;
+            const target = path.resolve(absoluteOutdir, targetSubpath);
+
             fs.ensureDirSync(path.dirname(target));
             fs.copyFileSync(`${tmpFilePath}.js`, target);
 
-            console.log('[esbuild-css-modules-plugin]', path.relative(rootDir, sourceFullPath), '=>', path.relative(rootDir, target))
+            console.log('[esbuild-css-modules-plugin]', path.relative(rootDir, sourceFullPath), '=>', path.relative(rootDir, target));
           }
 
           if (!bundle) {
