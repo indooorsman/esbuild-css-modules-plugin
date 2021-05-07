@@ -16,7 +16,7 @@ esbuild.build({
   plugins: [
     cssModulesPlugin()
   ],
-  logLevel: 'verbose'
+  logLevel: 'info'
 }).then((result) => {
   console.log('[test][esbuild:bundle] done, please check `test/dist/bundle`');
 });
@@ -33,7 +33,7 @@ esbuild.build({
   plugins: [
     cssModulesPlugin()
   ],
-  logLevel: 'verbose'
+  logLevel: 'info'
 }).then((result) => {
   console.log('[test][esbuild:no-bundle] done, please check `test/dist/no-bundle`');
 });
