@@ -83,13 +83,23 @@ const CssModulesPlugin = (options = {}) => {
             path: `${tmpFilePath}.js`,
             namespace: pluginNamespace,
             pluginData: {
-              content: jsContent
+              content: jsContent,
+              resolveArgs: {
+                path: args.path,
+                importer: args.importer,
+                namespace: args.namespace,
+                resolveDir: args.resolveDir,
+                kind: args.kind
+              }
             }
           };
         }
       );
 
       build.onLoad({ filter: /\.modules?\.css\.js$/, namespace: pluginNamespace }, (args) => {
+        const {path: resolvePath, importer} = args.pluginData.resolveArgs;
+        const importerName = path.basename(importer);
+        console.log('[esbuild-css-modules-plugin]', `${resolvePath} => ${resolvePath}.js => ${importerName}`);
         return { contents: args.pluginData.content, loader: 'js' };
       });
     }
