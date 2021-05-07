@@ -38,20 +38,20 @@ const buildCssModulesJS = async (cssFullPath, options) => {
   hash.update(cssFullPath);
   const digest = hash.copy().digest('hex');
   return `
-    const digest = '${digest}';
-    const css = \`${result.css}\`;
+const digest = '${digest}';
+const css = \`${result.css}\`;
 
-    (function() {
-      if (!document.getElementById(digest)) {
-        var ele = document.createElement('style');
-        ele.id = digest;
-        ele.textContent = css;
-        document.head.appendChild(ele);
-      }
-    })();
+(function() {
+  if (!document.getElementById(digest)) {
+    var ele = document.createElement('style');
+    ele.id = digest;
+    ele.textContent = css;
+    document.head.appendChild(ele);
+  }
+})();
 
-    export default ${classNames};
-    export { css, digest };
+export default ${classNames};
+export { css, digest };
   `;
 };
 
