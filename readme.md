@@ -2,6 +2,8 @@
 
 A esbuild plugin to bundle css modules into js(x)/ts(x).
 
+Works both with `bundle: false` and `bundle: true`.
+
 If build with `bundle: false`, `xxx.modules.css` will be transformed to `xxx.modules.css.js`.
 
 See [`./test/test.js`](https://github.com/indooorsman/esbuild-css-modules-plugin/blob/master/test/test.js) for examples.
