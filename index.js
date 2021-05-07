@@ -34,10 +34,25 @@ const buildCssModulesJS = async (cssFullPath, options) => {
     map: false
   });
 
-  const jsonStr = JSON.stringify(cssModulesJSON);
+  const classNames = JSON.stringify(cssModulesJSON);
   hash.update(cssFullPath);
-  const styleId = hash.copy().digest('hex');
-  return `(function(){if (!document.getElementById('${styleId}')) {var ele = document.createElement('style');ele.id = '${styleId}';ele.textContent = \`${result.css}\`;document.head.appendChild(ele);}})();export default ${jsonStr};`;
+  const digest = hash.copy().digest('hex');
+  return `
+    const digest = '${digest}';
+    const css = \`${result.css}\`;
+
+    (function() {
+      if (!document.getElementById(digest)) {
+        var ele = document.createElement('style');
+        ele.id = digest;
+        ele.textContent = css;
+        document.head.appendChild(ele);
+      }
+    })();
+
+    export default ${classNames};
+    export { css, digest };
+  `;
 };
 
 const CssModulesPlugin = (options = {}) => {
