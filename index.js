@@ -9,6 +9,7 @@ const hash = crypto.createHash('sha256');
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const ensureDir = util.promisify(fs.ensureDir);
+const pluginNamespace = 'esbuild-css-modules-plugin-namespace'
 
 const buildCssModulesJS = async (cssFullPath, options) => {
   const {
@@ -45,11 +46,13 @@ const CssModulesPlugin = (options = {}) => {
     setup(build) {
       const rootDir = process.cwd();
       const tmpDirPath = tmp.dirSync().name;
+      const { outdir, bundle } = build.initialOptions;
 
       build.onResolve(
-        { filter: /\.modules?\.(css)$/ },
+        { filter: /\.modules?\.css$/, namespace: 'file' },
         async (args) => {
           const sourceFullPath = path.resolve(args.resolveDir, args.path);
+
           const sourceExt = path.extname(sourceFullPath);
           const sourceBaseName = path.basename(sourceFullPath, sourceExt);
           const sourceDir = path.dirname(sourceFullPath);
@@ -63,11 +66,32 @@ const CssModulesPlugin = (options = {}) => {
 
           await writeFile(`${tmpFilePath}.js`, jsContent);
 
+          if (outdir && !bundle) {
+            fs.ensureDirSync(outdir);
+            const target = path.resolve(outdir, `${path.relative(rootDir, sourceFullPath)}.js`);
+            fs.ensureDirSync(path.dirname(target));
+            fs.copyFileSync(`${tmpFilePath}.js`, target);
+
+            console.log('[esbuild-css-modules-plugin]', path.relative(rootDir, sourceFullPath), '=>', path.relative(rootDir, target))
+          }
+
+          if (!bundle) {
+            return { path: sourceFullPath, namespace: 'file' };
+          }
+
           return {
             path: `${tmpFilePath}.js`,
+            namespace: pluginNamespace,
+            pluginData: {
+              content: jsContent
+            }
           };
         }
       );
+
+      build.onLoad({ filter: /\.modules?\.css\.js$/, namespace: pluginNamespace }, (args) => {
+        return { contents: args.pluginData.content, loader: 'js' };
+      });
     }
   };
 };

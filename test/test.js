@@ -15,13 +15,14 @@ esbuild.build({
   write: true,
   plugins: [
     cssModulesPlugin()
-  ]
+  ],
+  logLevel: 'verbose'
 }).then((result) => {
   console.log('[test][esbuild:bundle] done, please check `test/dist/bundle`');
 });
 
 esbuild.build({
-  entryPoints: ['app.modules.css', 'app.jsx', 'hello.world.jsx'],
+  entryPoints: ['./styles/app.modules.css', 'app.jsx', './components/hello.world.jsx'],
   format: 'esm',
   target: ['es2020'],
   bundle: false,
@@ -31,7 +32,8 @@ esbuild.build({
   write: true,
   plugins: [
     cssModulesPlugin()
-  ]
+  ],
+  logLevel: 'verbose'
 }).then((result) => {
   console.log('[test][esbuild:no-bundle] done, please check `test/dist/no-bundle`');
 });
