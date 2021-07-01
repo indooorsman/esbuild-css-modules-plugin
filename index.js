@@ -108,6 +108,7 @@ const CssModulesPlugin = (options = {}) => {
               content: jsContent,
               resolveArgs: {
                 path: args.path,
+                fullPath: sourceFullPath,
                 importer: args.importer,
                 namespace: args.namespace,
                 resolveDir: args.resolveDir,
@@ -119,10 +120,10 @@ const CssModulesPlugin = (options = {}) => {
       );
 
       build.onLoad({ filter: /\.modules?\.css\.js$/, namespace: pluginNamespace }, (args) => {
-        const {path: resolvePath, importer} = args.pluginData.resolveArgs;
+        const {path: resolvePath, importer, fullPath} = args.pluginData.resolveArgs;
         const importerName = path.basename(importer);
         console.log('[esbuild-css-modules-plugin]', `${resolvePath} => ${resolvePath}.js => ${importerName}`);
-        return { contents: args.pluginData.content, loader: 'js' };
+        return { contents: args.pluginData.content, loader: 'js', watchFiles: [fullPath] };
       });
     }
   };
