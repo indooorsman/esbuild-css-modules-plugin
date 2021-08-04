@@ -38,19 +38,21 @@ const buildCssModulesJS = async (cssFullPath, options) => {
   const classNames = JSON.stringify(cssModulesJSON);
   hash.update(cssFullPath);
   const digest = hash.copy().digest('hex');
+  
+  const injectedCode = inject === true ? `(function() {
+  if (!document.getElementById(digest)) {
+    var el = document.createElement('style');
+    el.id = digest;
+    el.textContent = css;
+    document.head.appendChild(el);
+  }
+})();
+  ` : typeof(inject) === 'function' ? inject() : ''
+
   return `
 const digest = '${digest}';
 const css = \`${result.css}\`;
-${inject && `
-(function() {
-  if (!document.getElementById(digest)) {
-    var ele = document.createElement('style');
-    ele.id = digest;
-    ele.textContent = css;
-    document.head.appendChild(ele);
-  }
-})();
-`}
+${injectedCode}
 export default ${classNames};
 export { css, digest };
   `;
