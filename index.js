@@ -9,14 +9,10 @@ const hash = crypto.createHash('sha256');
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const ensureDir = util.promisify(fs.ensureDir);
-const pluginNamespace = 'esbuild-css-modules-plugin-namespace'
+const pluginNamespace = 'esbuild-css-modules-plugin-namespace';
 
 const buildCssModulesJS = async (cssFullPath, options) => {
-  const {
-    localsConvention = 'camelCaseOnly',
-    inject = true,
-    generateScopedName
-  } = options;
+  const { localsConvention = 'camelCaseOnly', inject = true, generateScopedName } = options;
 
   const css = await readFile(cssFullPath);
 
@@ -38,8 +34,11 @@ const buildCssModulesJS = async (cssFullPath, options) => {
   const classNames = JSON.stringify(cssModulesJSON);
   hash.update(cssFullPath);
   const digest = hash.copy().digest('hex');
-  
-  const injectedCode = inject === true ? `(function() {
+
+  let injectedCode = '';
+  if (inject === true) {
+    injectedCode = `
+(function() {
   if (!document.getElementById(digest)) {
     var el = document.createElement('style');
     el.id = digest;
@@ -47,7 +46,10 @@ const buildCssModulesJS = async (cssFullPath, options) => {
     document.head.appendChild(el);
   }
 })();
-  ` : typeof(inject) === 'function' ? inject() : ''
+    `;
+  } else if (typeof inject === 'function') {
+    injectedCode = inject(css, digest);
+  }
 
   return `
 const digest = '${digest}';
@@ -66,65 +68,75 @@ const CssModulesPlugin = (options = {}) => {
       const tmpDirPath = tmp.dirSync().name;
       const { outdir, bundle } = build.initialOptions;
 
-      build.onResolve(
-        { filter: /\.modules?\.css$/, namespace: 'file' },
-        async (args) => {
-          const sourceFullPath = path.resolve(args.resolveDir, args.path);
+      build.onResolve({ filter: /\.modules?\.css$/, namespace: 'file' }, async (args) => {
+        const sourceFullPath = path.resolve(args.resolveDir, args.path);
 
-          const sourceExt = path.extname(sourceFullPath);
-          const sourceBaseName = path.basename(sourceFullPath, sourceExt);
-          const sourceDir = path.dirname(sourceFullPath);
-          const sourceRelDir = path.relative(path.dirname(rootDir), sourceDir);
+        const sourceExt = path.extname(sourceFullPath);
+        const sourceBaseName = path.basename(sourceFullPath, sourceExt);
+        const sourceDir = path.dirname(sourceFullPath);
+        const sourceRelDir = path.relative(path.dirname(rootDir), sourceDir);
 
-          const tmpDir = path.resolve(tmpDirPath, sourceRelDir);
-          await ensureDir(tmpDir);
-          const tmpFilePath = path.resolve(tmpDir, `${sourceBaseName}.css`);
+        const tmpDir = path.resolve(tmpDirPath, sourceRelDir);
+        await ensureDir(tmpDir);
+        const tmpFilePath = path.resolve(tmpDir, `${sourceBaseName}.css`);
 
-          const jsContent = await buildCssModulesJS(sourceFullPath, options);
+        const jsContent = await buildCssModulesJS(sourceFullPath, options);
 
-          await writeFile(`${tmpFilePath}.js`, jsContent);
+        await writeFile(`${tmpFilePath}.js`, jsContent);
 
-          if (outdir && !bundle) {
-            const isOutdirAbsolute = path.isAbsolute(outdir);
-            const absoluteOutdir = isOutdirAbsolute ? outdir : path.resolve(args.resolveDir, outdir);
-            const isEntryAbsolute = path.isAbsolute(args.path);
-            const entryRelDir = isEntryAbsolute ? path.dirname(path.relative(args.resolveDir, args.path)) : path.dirname(args.path);
+        if (outdir && !bundle) {
+          const isOutdirAbsolute = path.isAbsolute(outdir);
+          const absoluteOutdir = isOutdirAbsolute ? outdir : path.resolve(args.resolveDir, outdir);
+          const isEntryAbsolute = path.isAbsolute(args.path);
+          const entryRelDir = isEntryAbsolute
+            ? path.dirname(path.relative(args.resolveDir, args.path))
+            : path.dirname(args.path);
 
-            const targetSubpath = absoluteOutdir.indexOf(entryRelDir) === -1 ? path.join(entryRelDir, `${sourceBaseName}.css.js`) : `${sourceBaseName}.css.js`;
-            const target = path.resolve(absoluteOutdir, targetSubpath);
+          const targetSubpath =
+            absoluteOutdir.indexOf(entryRelDir) === -1
+              ? path.join(entryRelDir, `${sourceBaseName}.css.js`)
+              : `${sourceBaseName}.css.js`;
+          const target = path.resolve(absoluteOutdir, targetSubpath);
 
-            fs.ensureDirSync(path.dirname(target));
-            fs.copyFileSync(`${tmpFilePath}.js`, target);
+          fs.ensureDirSync(path.dirname(target));
+          fs.copyFileSync(`${tmpFilePath}.js`, target);
 
-            console.log('[esbuild-css-modules-plugin]', path.relative(rootDir, sourceFullPath), '=>', path.relative(rootDir, target));
-          }
-
-          if (!bundle) {
-            return { path: sourceFullPath, namespace: 'file' };
-          }
-
-          return {
-            path: `${tmpFilePath}.js`,
-            namespace: pluginNamespace,
-            pluginData: {
-              content: jsContent,
-              resolveArgs: {
-                path: args.path,
-                fullPath: sourceFullPath,
-                importer: args.importer,
-                namespace: args.namespace,
-                resolveDir: args.resolveDir,
-                kind: args.kind
-              }
-            }
-          };
+          console.log(
+            '[esbuild-css-modules-plugin]',
+            path.relative(rootDir, sourceFullPath),
+            '=>',
+            path.relative(rootDir, target)
+          );
         }
-      );
+
+        if (!bundle) {
+          return { path: sourceFullPath, namespace: 'file' };
+        }
+
+        return {
+          path: `${tmpFilePath}.js`,
+          namespace: pluginNamespace,
+          pluginData: {
+            content: jsContent,
+            resolveArgs: {
+              path: args.path,
+              fullPath: sourceFullPath,
+              importer: args.importer,
+              namespace: args.namespace,
+              resolveDir: args.resolveDir,
+              kind: args.kind
+            }
+          }
+        };
+      });
 
       build.onLoad({ filter: /\.modules?\.css\.js$/, namespace: pluginNamespace }, (args) => {
-        const {path: resolvePath, importer, fullPath} = args.pluginData.resolveArgs;
+        const { path: resolvePath, importer, fullPath } = args.pluginData.resolveArgs;
         const importerName = path.basename(importer);
-        console.log('[esbuild-css-modules-plugin]', `${resolvePath} => ${resolvePath}.js => ${importerName}`);
+        console.log(
+          '[esbuild-css-modules-plugin]',
+          `${resolvePath} => ${resolvePath}.js => ${importerName}`
+        );
         return { contents: args.pluginData.content, loader: 'js', watchFiles: [fullPath] };
       });
     }
