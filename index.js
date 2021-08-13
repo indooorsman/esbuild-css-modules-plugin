@@ -12,7 +12,13 @@ const ensureDir = util.promisify(fs.ensureDir);
 const pluginNamespace = 'esbuild-css-modules-plugin-namespace';
 
 const buildCssModulesJS = async (cssFullPath, options) => {
-  const { localsConvention = 'camelCaseOnly', inject = true, generateScopedName } = options;
+  const {
+    localsConvention = 'camelCaseOnly',
+    inject = true,
+    generateScopedName,
+    v2,
+    bundle
+  } = options;
 
   const css = await readFile(cssFullPath);
 
@@ -51,13 +57,24 @@ const buildCssModulesJS = async (cssFullPath, options) => {
     injectedCode = inject(css, digest);
   }
 
-  return `
+  let jsContent = `
 const digest = '${digest}';
 const css = \`${result.css}\`;
 ${injectedCode}
 export default ${classNames};
 export { css, digest };
   `;
+
+  if (bundle && v2) {
+    jsContent = `
+export default ${classNames};    
+    `;
+  }
+
+  return {
+    jsContent,
+    cssContent: result.css
+  };
 };
 
 const CssModulesPlugin = (options = {}) => {
@@ -67,6 +84,7 @@ const CssModulesPlugin = (options = {}) => {
       const rootDir = process.cwd();
       const tmpDirPath = tmp.dirSync().name;
       const { outdir, bundle } = build.initialOptions;
+      const { v2 } = options;
 
       build.onResolve({ filter: /\.modules?\.css$/, namespace: 'file' }, async (args) => {
         const sourceFullPath = path.resolve(args.resolveDir, args.path);
@@ -80,7 +98,21 @@ const CssModulesPlugin = (options = {}) => {
         await ensureDir(tmpDir);
         const tmpFilePath = path.resolve(tmpDir, `${sourceBaseName}.css`);
 
-        const jsContent = await buildCssModulesJS(sourceFullPath, options);
+        const { jsContent: _jsContent, cssContent } = await buildCssModulesJS(sourceFullPath, {
+          ...options,
+          bundle
+        });
+        let jsContent = _jsContent;
+        const tmpCss = path.resolve(
+          sourceDir,
+          `_tmp_${sourceBaseName}.css`.replace(/\.modules?\./, '.')
+        );
+        if (bundle && v2) {
+          await writeFile(tmpCss, cssContent);
+          jsContent =
+            `import "${tmpCss}";
+          ` + _jsContent;
+        }
 
         await writeFile(`${tmpFilePath}.js`, jsContent);
 
@@ -120,6 +152,7 @@ const CssModulesPlugin = (options = {}) => {
             content: jsContent,
             resolveArgs: {
               path: args.path,
+              tmpCss,
               fullPath: sourceFullPath,
               importer: args.importer,
               namespace: args.namespace,
@@ -131,13 +164,31 @@ const CssModulesPlugin = (options = {}) => {
       });
 
       build.onLoad({ filter: /\.modules?\.css\.js$/, namespace: pluginNamespace }, (args) => {
-        const { path: resolvePath, importer, fullPath } = args.pluginData.resolveArgs;
+        const {
+          path: resolvePath,
+          importer,
+          fullPath,
+          resolveDir,
+          tmpCss
+        } = args.pluginData.resolveArgs;
         const importerName = path.basename(importer);
         console.log(
           '[esbuild-css-modules-plugin]',
           `${resolvePath} => ${resolvePath}.js => ${importerName}`
         );
-        return { contents: args.pluginData.content, loader: 'js', watchFiles: [fullPath] };
+        if (tmpCss) {
+          setTimeout(() => {
+            try {
+              fs.unlinkSync(tmpCss);
+            } catch (e) {}
+          }, 1000);
+        }
+        return {
+          contents: args.pluginData.content,
+          loader: 'js',
+          watchFiles: [fullPath],
+          resolveDir
+        };
       });
     }
   };

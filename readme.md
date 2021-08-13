@@ -35,11 +35,13 @@ esbuild.build({
       // ```
       // inject: (cssContent, digest) => `console.log("${cssContent}", "${digest}")`
       // ```
-      inject: true,
+      inject: false,
 
       localsConvention: 'camelCaseOnly', // optional. value could be one of 'camelCaseOnly', 'camelCase', 'dashes', 'dashesOnly', default is 'camelCaseOnly'
       
-      generateScopedName: (name, filename, css) => string // optional. 
+      generateScopedName: (name, filename, css) => string, // optional. 
+
+      v2: true // recommend. v2 can bundle images in css
     })
   ]
 });
