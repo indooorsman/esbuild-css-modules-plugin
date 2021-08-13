@@ -41,7 +41,7 @@ esbuild.build({
       
       generateScopedName: (name, filename, css) => string, // optional. 
 
-      v2: true // recommend. v2 can bundle images in css
+      v2: true // recommend. v2 can bundle images in css, note if set `v2` to true, the `inject` option will be ignored 
     })
   ]
 });
