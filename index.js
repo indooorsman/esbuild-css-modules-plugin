@@ -81,6 +81,7 @@ const CssModulesPlugin = (options = {}) => {
   return {
     name: 'esbuild-css-modules-plugin',
     setup(build) {
+      const tmpCsses = [];
       const rootDir = process.cwd();
       const tmpDirPath = tmp.dirSync().name;
       const { outdir, bundle } = build.initialOptions;
@@ -109,6 +110,7 @@ const CssModulesPlugin = (options = {}) => {
         );
         if (bundle && v2) {
           await writeFile(tmpCss, cssContent);
+          tmpCsses.push(tmpCss);
           jsContent =
             `import "${tmpCss}";
           ` + _jsContent;
@@ -176,19 +178,17 @@ const CssModulesPlugin = (options = {}) => {
           '[esbuild-css-modules-plugin]',
           `${resolvePath} => ${resolvePath}.js => ${importerName}`
         );
-        if (tmpCss) {
-          setTimeout(() => {
-            try {
-              fs.unlinkSync(tmpCss);
-            } catch (e) {}
-          }, 1000);
-        }
         return {
           contents: args.pluginData.content,
           loader: 'js',
           watchFiles: [fullPath],
           resolveDir
         };
+      });
+
+      build.onEnd(() => {
+        console.log('Clean temp files...')
+        tmpCsses.forEach(f => fs.unlinkSync(f));
       });
     }
   };
