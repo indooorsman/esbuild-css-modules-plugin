@@ -55,7 +55,7 @@ const buildCssModulesJS = async (cssFullPath, options) => {
 })();
     `;
   } else if (typeof inject === 'function') {
-    injectedCode = inject(css, digest);
+    injectedCode = inject(result.css, digest);
   }
 
   let jsContent = `
