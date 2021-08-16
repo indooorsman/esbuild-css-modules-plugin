@@ -18,7 +18,11 @@ fse.emptyDirSync('./dist');
       cssModulesPlugin({
         inject: false
       })
-    ]
+    ],
+    logLevel: 'debug',
+    loader: {
+      '.jpg': 'file'
+    }
   });
   console.log('[test][esbuild:bundle-no-inject] done, please check `test/dist/bundle-no-inject`', '\n');
 
@@ -32,7 +36,10 @@ fse.emptyDirSync('./dist');
     outdir: './dist/no-bundle',
     write: true,
     plugins: [cssModulesPlugin()],
-    logLevel: 'debug'
+    logLevel: 'debug',
+    loader: {
+      '.jpg': 'file'
+    }
   });
   console.log('[test][esbuild:no-bundle] done, please check `test/dist/no-bundle`', '\n');
 
@@ -41,7 +48,7 @@ fse.emptyDirSync('./dist');
     format: 'esm',
     target: ['es2020'],
     bundle: true,
-    minify: true,
+    minify: false,
     sourcemap: true,
     external: ['react', 'react-dom'],
     outdir: './dist/bundle-v2',
