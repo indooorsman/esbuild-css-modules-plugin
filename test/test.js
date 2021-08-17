@@ -50,6 +50,7 @@ fse.emptyDirSync('./dist');
     bundle: true,
     minify: false,
     sourcemap: true,
+    publicPath: '/static/',
     external: ['react', 'react-dom'],
     outdir: './dist/bundle-v2',
     write: true,

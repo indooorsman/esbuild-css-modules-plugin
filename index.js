@@ -11,6 +11,25 @@ const readFile = util.promisify(fse.readFile);
 const writeFile = util.promisify(fse.writeFile);
 const ensureDir = util.promisify(fse.ensureDir);
 const pluginNamespace = 'esbuild-css-modules-plugin-namespace';
+const csstree = require('css-tree');
+
+const transformUrlsInCss = (cssContent, fullPath) => {
+  const resolveDir = path.dirname(fullPath);
+  const ast = csstree.parse(cssContent);
+  csstree.walk(ast, {
+    visit: 'Url',
+    enter: (node) => {
+      const originPath = node.value.value;
+      const absolutePath = path.resolve(
+        resolveDir,
+        originPath.replaceAll(`"`, '').replaceAll(`'`, '')
+      );
+      node.value.value = JSON.stringify(absolutePath);
+    }
+  });
+  const transformedCssContent = csstree.generate(ast);
+  return transformedCssContent;
+};
 
 const buildCssModulesJS = async (cssFullPath, options) => {
   const {
@@ -72,10 +91,10 @@ export default ${classNames};
     `;
   }
 
-  return {
+  return Promise.resolve({
     jsContent,
     cssContent: result.css
-  };
+  });
 };
 
 const CssModulesPlugin = (options = {}) => {
@@ -93,37 +112,37 @@ const CssModulesPlugin = (options = {}) => {
       const useV2 = v2 && bundle;
 
       if (useV2) {
-        build.onResolve({ filter: /\.modules?\.css$/, namespace: 'file' }, (args) => {
-          const fullPath = path.resolve(args.resolveDir, args.path);
-          const tmpCssFile = fullPath.replace(/\.modules?\.css$/, '.modules_tmp_.css');
-          fs.writeFileSync(tmpCssFile, '/* placeholder */', { encoding: 'utf-8' });
-          outputLogs && console.log('[css-modules-puglin] create a placeholder file on resolve:', tmpCssFile);
-          return {
-            path: fullPath,
-            watchFiles: [fullPath]
-          };
-        });
         build.onLoad({ filter: /\.modules?\.css$/, namespace: 'file' }, async (args) => {
-          const { path: fullPath } = args;
-          const tmpCssFile = fullPath.replace(/\.modules?\.css$/, '.modules_tmp_.css');
+          const fullPath = args.path;
+          outputLogs && console.log(`[css-modules-plugin] ${fullPath}`);
+
+          const tmpCssFile = path.join(
+            tmp.dirSync().name,
+            fullPath.replace(/\.modules?\.css$/, '.modules_built.css')
+          );
+          fse.ensureDirSync(path.dirname(tmpCssFile));
+
           const { jsContent, cssContent } = await buildCssModulesJS(fullPath, {
             ...options,
             bundle
           });
-          fs.writeFileSync(tmpCssFile, cssContent, { encoding: 'utf-8' });
-  
-          const jsFileContent = `import "${tmpCssFile}";\n${jsContent}`;
+
+          const finalCss = transformUrlsInCss(cssContent, fullPath);
+          fs.writeFileSync(tmpCssFile, `${finalCss}`, { encoding: 'utf-8' });
+          outputLogs && console.log(`[css-modules-plugin] build css file`, tmpCssFile);
+
+          const jsFileContent = `import "${tmpCssFile}";${jsContent}`;
+
           tmpFiles.add(tmpCssFile);
-  
-          return {
+
+          return Promise.resolve({
             contents: jsFileContent,
-            loader: 'js',
             watchFiles: [fullPath]
-          };
+          });
         });
-  
+
         build.onEnd(() => {
-          outputLogs && console.log('[css-modules-plugin] Clean temp files...');
+          outputLogs && console.log('[css-modules-plugin] clean temp files...');
           tmpFiles.forEach((f) => {
             try {
               fs.unlinkSync(f);
@@ -140,14 +159,16 @@ const CssModulesPlugin = (options = {}) => {
           const tmpDir = path.resolve(tmpDirPath, sourceRelDir);
           await ensureDir(tmpDir);
           const tmpFilePath = path.resolve(tmpDir, `${sourceBaseName}.css`);
-  
-          const {jsContent} = await buildCssModulesJS(sourceFullPath, options);
-  
-          await writeFile(`${tmpFilePath}.js`, jsContent, {encoding: 'utf-8'});
-  
+
+          const { jsContent } = await buildCssModulesJS(sourceFullPath, options);
+
+          await writeFile(`${tmpFilePath}.js`, jsContent, { encoding: 'utf-8' });
+
           if (outdir && !bundle) {
             const isOutdirAbsolute = path.isAbsolute(outdir);
-            const absoluteOutdir = isOutdirAbsolute ? outdir : path.resolve(args.resolveDir, outdir);
+            const absoluteOutdir = isOutdirAbsolute
+              ? outdir
+              : path.resolve(args.resolveDir, outdir);
             const isEntryAbsolute = path.isAbsolute(args.path);
             const entryRelDir = isEntryAbsolute
               ? path.dirname(path.relative(args.resolveDir, args.path))
@@ -159,12 +180,13 @@ const CssModulesPlugin = (options = {}) => {
             const target = path.resolve(absoluteOutdir, targetSubpath);
             await ensureDir(path.dirname(target));
             fse.copyFileSync(`${tmpFilePath}.js`, target);
-            outputLogs && console.log(
-              '[css-modules-plugin]',
-              path.relative(rootDir, sourceFullPath),
-              '=>',
-              path.relative(rootDir, target)
-            );
+            outputLogs &&
+              console.log(
+                '[css-modules-plugin]',
+                path.relative(rootDir, sourceFullPath),
+                '=>',
+                path.relative(rootDir, target)
+              );
           }
           if (!bundle) {
             return { path: sourceFullPath, namespace: 'file' };
@@ -185,14 +207,15 @@ const CssModulesPlugin = (options = {}) => {
             }
           };
         });
-  
+
         build.onLoad({ filter: /\.modules?\.css\.js$/, namespace: pluginNamespace }, (args) => {
           const { path: resolvePath, importer, fullPath } = args.pluginData.resolveArgs;
           const importerName = path.basename(importer);
-          outputLogs && console.log(
-            '[css-modules-plugin]',
-            `${resolvePath} => ${resolvePath}.js => ${importerName}`
-          );
+          outputLogs &&
+            console.log(
+              '[css-modules-plugin]',
+              `${resolvePath} => ${resolvePath}.js => ${importerName}`
+            );
           return { contents: args.pluginData.content, loader: 'js', watchFiles: [fullPath] };
         });
       }
