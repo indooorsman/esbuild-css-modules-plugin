@@ -112,13 +112,13 @@ const CssModulesPlugin = (options = {}) => {
       const useV2 = v2 && bundle;
 
       if (useV2) {
-        build.onLoad({ filter: /\.modules?\.css$/, namespace: 'file' }, async (args) => {
+        build.onLoad({ filter: /\.modules?\.css$/ }, async (args) => {
           const fullPath = args.path;
-          outputLogs && console.log(`[css-modules-plugin] ${fullPath}`);
+          const tmpDir = tmp.dirSync().name;
 
           const tmpCssFile = path.join(
-            tmp.dirSync().name,
-            fullPath.replace(/\.modules?\.css$/, '.modules_built.css')
+            tmpDir,
+            fullPath.replace(rootDir, '').replace(/\.modules?\.css$/, '.modules_built.css')
           );
           fse.ensureDirSync(path.dirname(tmpCssFile));
 
@@ -129,7 +129,8 @@ const CssModulesPlugin = (options = {}) => {
 
           const finalCss = transformUrlsInCss(cssContent, fullPath);
           fs.writeFileSync(tmpCssFile, `${finalCss}`, { encoding: 'utf-8' });
-          outputLogs && console.log(`[css-modules-plugin] build css file`, tmpCssFile);
+          outputLogs &&
+            console.log(`[css-modules-plugin] build css file`, tmpCssFile.replace(tmpDir, ''));
 
           const jsFileContent = `import "${tmpCssFile}";${jsContent}`;
 
