@@ -104,7 +104,7 @@ const CssModulesPlugin = (options = {}) => {
       const tmpFiles = new Set();
       const rootDir = process.cwd();
       const tmpDirPath = tmp.dirSync().name;
-      const { outdir, bundle, logLevel } = build.initialOptions;
+      const { outdir, bundle, logLevel, watch } = build.initialOptions;
       const { v2 } = options;
 
       const outputLogs = logLevel === 'debug' || logLevel === 'verbose';
@@ -137,12 +137,14 @@ const CssModulesPlugin = (options = {}) => {
           tmpFiles.add(tmpCssFile);
 
           return Promise.resolve({
-            contents: jsFileContent,
-            watchFiles: [fullPath]
+            contents: jsFileContent
           });
         });
 
         build.onEnd(() => {
+          if (watch) {
+            return;
+          }
           outputLogs && console.log('[css-modules-plugin] clean temp files...');
           tmpFiles.forEach((f) => {
             try {
