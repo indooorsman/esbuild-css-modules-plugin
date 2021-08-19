@@ -1,4 +1,5 @@
 const path = require('path');
+const { createHash } = require('crypto');
 const fse = require('fs-extra');
 const fs = require('fs');
 const postcss = require('postcss');
@@ -101,11 +102,11 @@ const CssModulesPlugin = (options = {}) => {
   return {
     name: 'esbuild-css-modules-plugin',
     setup(build) {
+      const { outdir, bundle, logLevel, watch } = build.initialOptions;
+      const { v2 } = options;
       const tmpFiles = new Set();
       const rootDir = process.cwd();
       const tmpDirPath = tmp.dirSync().name;
-      const { outdir, bundle, logLevel, watch } = build.initialOptions;
-      const { v2 } = options;
 
       const outputLogs = logLevel === 'debug' || logLevel === 'verbose';
 
@@ -114,7 +115,13 @@ const CssModulesPlugin = (options = {}) => {
       if (useV2) {
         build.onLoad({ filter: /\.modules?\.css$/ }, async (args) => {
           const fullPath = args.path;
-          const tmpDir = tmp.dirSync().name;
+          const hex = createHash('sha256').update(fullPath).digest('hex');
+          const tmpDir = path.resolve(
+            process.cwd(),
+            outdir,
+            '.esbuild_plugin_css_modules',
+            hex.slice(hex.length - 255, hex.length)
+          );
 
           const tmpCssFile = path.join(
             tmpDir,
@@ -134,7 +141,7 @@ const CssModulesPlugin = (options = {}) => {
 
           const jsFileContent = `import "${tmpCssFile}";${jsContent}`;
 
-          tmpFiles.add(tmpCssFile);
+          tmpFiles.add(tmpDir);
 
           return Promise.resolve({
             contents: jsFileContent
@@ -148,7 +155,7 @@ const CssModulesPlugin = (options = {}) => {
           outputLogs && console.log('[css-modules-plugin] clean temp files...');
           tmpFiles.forEach((f) => {
             try {
-              fs.unlinkSync(f);
+              fse.removeSync(f);
             } catch (error) {}
           });
         });

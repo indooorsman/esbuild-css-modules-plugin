@@ -45,6 +45,7 @@ fse.emptyDirSync('./dist');
 
   await esbuild.build({
     entryPoints: ['app.jsx'],
+    entryNames: '[name]-[hash]',
     format: 'esm',
     target: ['es2020'],
     bundle: true,
