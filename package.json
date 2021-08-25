@@ -16,10 +16,10 @@
     "pub": "npm publish --userconfig ~/.pubnpmrc  --access public"
   },
   "devDependencies": {
-    "css-tree": "^1.1.3",
     "esbuild": "^0.12.19"
   },
   "dependencies": {
+    "css-tree": "^1.1.3",
     "fs-extra": "^9.1.0",
     "postcss": "^8.2.7",
     "postcss-modules": "^4.0.0",
