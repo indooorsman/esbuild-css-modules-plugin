@@ -11,7 +11,6 @@ const readFile = util.promisify(fse.readFile);
 const writeFile = util.promisify(fse.writeFile);
 const ensureDir = util.promisify(fse.ensureDir);
 const pluginNamespace = 'esbuild-css-modules-plugin-namespace';
-const browserslist = require('browserslist');
 const cssHandler = require('@parcel/css');
 const camelCase = require('lodash/camelCase');
 
