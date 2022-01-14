@@ -1,4 +1,10 @@
 .hello-world {
   color: red;
-  background: url(../components/world.jpg);
+  background: url("../components/world.jpg");
+  position: sticky;
+}
+
+.hello-world:hover {
+  color: yellow;
+  border-radius: 0;
 }
