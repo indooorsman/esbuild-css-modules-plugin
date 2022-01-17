@@ -49,7 +49,7 @@ fse.emptyDirSync('./dist');
     format: 'esm',
     target: ['es2020'],
     bundle: true,
-    minify: false,
+    minify: true,
     sourcemap: true,
     publicPath: '/static/',
     external: ['react', 'react-dom'],

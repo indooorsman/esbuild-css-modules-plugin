@@ -6,40 +6,55 @@ const postcss = require('postcss');
 const cssModules = require('postcss-modules');
 const util = require('util');
 const tmp = require('tmp');
-const crypto = require('crypto');
-const hash = crypto.createHash('sha256');
+const hash = createHash('sha256');
 const readFile = util.promisify(fse.readFile);
 const writeFile = util.promisify(fse.writeFile);
 const ensureDir = util.promisify(fse.ensureDir);
 const pluginNamespace = 'esbuild-css-modules-plugin-namespace';
-const csstree = require('css-tree');
+const cssHandler = require('@parcel/css');
+const camelCase = require('lodash/camelCase');
 
-const transformUrlsInCss = (cssContent, fullPath) => {
-  const resolveDir = path.dirname(fullPath);
-  const ast = csstree.parse(cssContent);
-  csstree.walk(ast, {
-    visit: 'Url',
-    enter: (node) => {
-      const originPath = node.value.value;
-      const absolutePath = path.resolve(
-        resolveDir,
-        originPath.replaceAll(`"`, '').replaceAll(`'`, '')
-      );
-      node.value.value = JSON.stringify(absolutePath);
-    }
+const getAbsoluteUrl = (resolveDir, url) => {
+  const absolutePath = path.resolve(resolveDir, url.replaceAll(`"`, '').replaceAll(`'`, ''));
+  return JSON.stringify(absolutePath);
+};
+
+const buildCssModulesJS2 = async (cssFullPath) => {
+  const resolveDir = path.dirname(cssFullPath);
+  const cssContent = await readFile(cssFullPath);
+  const transformConfig = {
+    filename: path.basename(cssFullPath),
+    code: cssContent,
+    minify: false,
+    sourceMap: true,
+    cssModules: true,
+    analyzeDependencies: true
+  };
+  const { code, exports, map, dependencies } = cssHandler.transform(transformConfig);
+  const cssModulesJSON = {};
+  Object.keys(exports).forEach((originClass) => {
+    cssModulesJSON[camelCase(originClass)] = exports[originClass].name;
   });
-  const transformedCssContent = csstree.generate(ast);
-  return transformedCssContent;
+  const classNames = JSON.stringify(cssModulesJSON);
+  const jsContent = `
+    export default ${classNames};    
+  `;
+  const urls = dependencies?.filter((d) => d.type === 'url') ?? [];
+  let finalCssContent = code.toString('utf-8');
+  urls.forEach(({ url, placeholder }) => {
+    finalCssContent = finalCssContent.replaceAll(placeholder, getAbsoluteUrl(resolveDir, url));
+  });
+  if (map) {
+    finalCssContent += `\n/*# sourceMappingURL=data:application/json;base64,${map.toString('base64')} */`;
+  }
+  return {
+    jsContent,
+    cssContent: finalCssContent
+  };
 };
 
 const buildCssModulesJS = async (cssFullPath, options) => {
-  const {
-    localsConvention = 'camelCaseOnly',
-    inject = true,
-    generateScopedName,
-    v2,
-    bundle
-  } = options;
+  const { localsConvention = 'camelCaseOnly', inject = true, generateScopedName } = options;
 
   const css = await readFile(cssFullPath);
 
@@ -86,27 +101,21 @@ export default ${classNames};
 export { css, digest };
   `;
 
-  if (bundle && v2) {
-    jsContent = `
-export default ${classNames};    
-    `;
-  }
-
-  return Promise.resolve({
+  return {
     jsContent,
     cssContent: result.css
-  });
+  };
 };
 
 const CssModulesPlugin = (options = {}) => {
   return {
     name: 'esbuild-css-modules-plugin',
     setup(build) {
-      const { outdir, bundle, logLevel, watch } = build.initialOptions;
+      const { outdir, bundle, logLevel, watch, target } = build.initialOptions;
       const { v2 } = options;
-      const tmpFiles = new Set();
       const rootDir = process.cwd();
       const tmpDirPath = tmp.dirSync().name;
+      const tmpRoot = path.resolve(process.cwd(), outdir, '.esbuild_plugin_css_modules');
 
       const outputLogs = logLevel === 'debug' || logLevel === 'verbose';
 
@@ -116,36 +125,28 @@ const CssModulesPlugin = (options = {}) => {
         build.onLoad({ filter: /\.modules?\.css$/ }, async (args) => {
           const fullPath = args.path;
           const hex = createHash('sha256').update(fullPath).digest('hex');
-          const tmpDir = path.resolve(
-            process.cwd(),
-            outdir,
-            '.esbuild_plugin_css_modules',
-            hex.slice(hex.length - 255, hex.length)
-          );
+          const tmpDir = path.resolve(tmpRoot, hex.slice(hex.length - 255, hex.length));
 
           const tmpCssFile = path.join(
             tmpDir,
             fullPath.replace(rootDir, '').replace(/\.modules?\.css$/, '.modules_built.css')
           );
+
           fse.ensureDirSync(path.dirname(tmpCssFile));
 
-          const { jsContent, cssContent } = await buildCssModulesJS(fullPath, {
-            ...options,
-            bundle
-          });
-
-          const finalCss = transformUrlsInCss(cssContent, fullPath);
-          fs.writeFileSync(tmpCssFile, `${finalCss}`, { encoding: 'utf-8' });
+          const { jsContent, cssContent } = await buildCssModulesJS2(fullPath);
+          fs.writeFileSync(tmpCssFile, `${cssContent}`, { encoding: 'utf-8' });
           outputLogs &&
             console.log(`[css-modules-plugin] build css file`, tmpCssFile.replace(tmpDir, ''));
 
-          const jsFileContent = `import "${tmpCssFile}";${jsContent}`;
+          const jsFileContent = `import "${tmpCssFile
+            // fix path issue on Windows: https://github.com/indooorsman/esbuild-css-modules-plugin/issues/12
+            .split(path.sep)
+            .join(path.posix.sep)}";\n${jsContent}`;
 
-          tmpFiles.add(tmpDir);
-
-          return Promise.resolve({
+          return {
             contents: jsFileContent
-          });
+          };
         });
 
         build.onEnd(() => {
@@ -153,11 +154,9 @@ const CssModulesPlugin = (options = {}) => {
             return;
           }
           outputLogs && console.log('[css-modules-plugin] clean temp files...');
-          tmpFiles.forEach((f) => {
-            try {
-              fse.removeSync(f);
-            } catch (error) {}
-          });
+          try {
+            fse.removeSync(tmpRoot);
+          } catch (error) {}
         });
       } else {
         build.onResolve({ filter: /\.modules?\.css$/, namespace: 'file' }, async (args) => {
