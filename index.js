@@ -53,8 +53,10 @@ const buildCssModulesJS2 = async (cssFullPath) => {
   };
 };
 
+const defaultResolve = file => file;
+
 const buildCssModulesJS = async (cssFullPath, options) => {
-  const { localsConvention = 'camelCaseOnly', inject = true, generateScopedName } = options;
+  const { resolve = defaultResolve, localsConvention = 'camelCaseOnly', inject = true, generateScopedName } = options;
 
   const css = await readFile(cssFullPath);
 
@@ -63,6 +65,7 @@ const buildCssModulesJS = async (cssFullPath, options) => {
     cssModules({
       localsConvention,
       generateScopedName,
+      resolve,
       getJSON(cssSourceFile, json) {
         cssModulesJSON = { ...json };
         return cssModulesJSON;

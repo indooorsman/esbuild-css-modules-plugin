@@ -41,7 +41,16 @@ esbuild.build({
       
       generateScopedName: (name, filename, css) => string, // optional. 
 
-      v2: true // experimental. v2 can bundle images in css, note if set `v2` to true, all other options will be ignored. and v2 only works with `bundle: true`.
+      v2: true, // experimental. v2 can bundle images in css, note if set `v2` to true, all other options will be ignored. and v2 only works with `bundle: true`.
+
+      // optional. If omitted uses the default behavior.
+      // This is used to override the resolved path for modules imported inside of
+      // other modules (I.E. using `from` or `value`). This is expected to be a
+      // function that receives a `file` string representing the full file path
+      // and returns a string representing the modified file path.
+      resolve(file) {
+        return path.resolve(process.cwd(), 'src/styles', file);
+      }
     })
   ]
 });
