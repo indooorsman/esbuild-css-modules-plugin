@@ -45,7 +45,9 @@ const buildCssModulesJS2 = async (cssFullPath) => {
     finalCssContent = finalCssContent.replaceAll(placeholder, getAbsoluteUrl(resolveDir, url));
   });
   if (map) {
-    finalCssContent += `\n/*# sourceMappingURL=data:application/json;base64,${map.toString('base64')} */`;
+    finalCssContent += `\n/*# sourceMappingURL=data:application/json;base64,${map.toString(
+      'base64'
+    )} */`;
   }
   return {
     jsContent,
@@ -54,7 +56,12 @@ const buildCssModulesJS2 = async (cssFullPath) => {
 };
 
 const buildCssModulesJS = async (cssFullPath, options) => {
-  const { localsConvention = 'camelCaseOnly', inject = true, generateScopedName } = options;
+  const {
+    localsConvention = 'camelCaseOnly',
+    inject = true,
+    generateScopedName,
+    cssModulesOption = {}
+  } = options;
 
   const css = await readFile(cssFullPath);
 
@@ -66,10 +73,11 @@ const buildCssModulesJS = async (cssFullPath, options) => {
       getJSON(cssSourceFile, json) {
         cssModulesJSON = { ...json };
         return cssModulesJSON;
-      }
+      },
+      ...cssModulesOption
     })
   ]).process(css, {
-    from: undefined,
+    from: cssFullPath,
     map: false
   });
 

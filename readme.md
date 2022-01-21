@@ -39,7 +39,12 @@ esbuild.build({
 
       localsConvention: 'camelCaseOnly', // optional. value could be one of 'camelCaseOnly', 'camelCase', 'dashes', 'dashesOnly', default is 'camelCaseOnly'
       
-      generateScopedName: (name, filename, css) => string, // optional. 
+      generateScopedName: (name, filename, css) => string, // optional. refer to: https://github.com/madyankin/postcss-modules#generating-scoped-names
+
+      cssModulesOption: { 
+        // optional, refer to: https://github.com/madyankin/postcss-modules/blob/d7cefc427c43bf35f7ebc55e7bda33b4689baf5a/index.d.ts#L27
+        // this option will override others passed to postcss-modules
+      },
 
       v2: true // experimental. v2 can bundle images in css, note if set `v2` to true, all other options will be ignored. and v2 only works with `bundle: true`.
     })

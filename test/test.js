@@ -12,11 +12,34 @@ fse.emptyDirSync('./dist');
     minify: false,
     sourcemap: true,
     external: ['react', 'react-dom'],
+    outdir: './dist/bundle-default',
+    write: true,
+    plugins: [
+      cssModulesPlugin()
+    ],
+    logLevel: 'debug',
+    loader: {
+      '.jpg': 'file'
+    }
+  });
+  console.log('[test][esbuild:bundle-default] done, please check `test/dist/bundle-default`', '\n');
+
+  await esbuild.build({
+    entryPoints: ['app.jsx'],
+    format: 'esm',
+    target: ['es2020'],
+    bundle: true,
+    minify: false,
+    sourcemap: true,
+    external: ['react', 'react-dom'],
     outdir: './dist/bundle-no-inject',
     write: true,
     plugins: [
       cssModulesPlugin({
-        inject: false
+        inject: false,
+        cssModulesOption: {
+          generateScopedName: '[path][name]__[local]___[hash:base64:8]'
+        }
       })
     ],
     logLevel: 'debug',
@@ -27,7 +50,7 @@ fse.emptyDirSync('./dist');
   console.log('[test][esbuild:bundle-no-inject] done, please check `test/dist/bundle-no-inject`', '\n');
 
   await esbuild.build({
-    entryPoints: ['./styles/app.modules.css', 'app.jsx', './components/hello.world.jsx'],
+    entryPoints: ['./styles/app.modules.css', './styles/deep/styles/hello.modules.css', 'app.jsx', './components/hello.world.jsx'],
     format: 'esm',
     target: ['es2020'],
     bundle: false,
@@ -49,7 +72,7 @@ fse.emptyDirSync('./dist');
     format: 'esm',
     target: ['es2020'],
     bundle: true,
-    minify: true,
+    minify: false,
     sourcemap: true,
     publicPath: '/static/',
     external: ['react', 'react-dom'],
