@@ -1,5 +1,7 @@
 # esbuild-css-modules-plugin
 
+[![npm version](https://img.shields.io/npm/v/esbuild-css-modules-plugin.svg?style=flat)](https://www.npmjs.com/package/esbuild-css-modules-plugin)
+
 A esbuild plugin to bundle css modules into js(x)/ts(x).
 
 Works both with `bundle: false` and `bundle: true`.
