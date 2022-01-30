@@ -15,8 +15,7 @@ const cssHandler = require('@parcel/css');
 const camelCase = require('lodash/camelCase');
 
 const getAbsoluteUrl = (resolveDir, url) => {
-  const absolutePath = path.resolve(resolveDir, url.replaceAll(`"`, '').replaceAll(`'`, ''));
-  return JSON.stringify(absolutePath);
+  return path.resolve(resolveDir, url.replace(/\"/g, '').replace(/\'/g, ''));
 };
 
 const buildCssModulesJS2 = async (cssFullPath) => {
@@ -42,7 +41,10 @@ const buildCssModulesJS2 = async (cssFullPath) => {
   const urls = dependencies?.filter((d) => d.type === 'url') ?? [];
   let finalCssContent = code.toString('utf-8');
   urls.forEach(({ url, placeholder }) => {
-    finalCssContent = finalCssContent.replaceAll(placeholder, getAbsoluteUrl(resolveDir, url));
+    finalCssContent = finalCssContent.replace(
+      new RegExp(`${placeholder}`, 'g'),
+      getAbsoluteUrl(resolveDir, url)
+    );
   });
   if (map) {
     finalCssContent += `\n/*# sourceMappingURL=data:application/json;base64,${map.toString(
