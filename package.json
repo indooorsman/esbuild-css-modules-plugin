@@ -18,6 +18,9 @@
     "test": "cd ./test && node test.js",
     "pub": "npm_config_registry=\"https://registry.npmjs.org/\" npm publish --userconfig ~/.pubnpmrc  --access public"
   },
+  "devDependencies": {
+    "esbuild": "^0.14.21"
+  },
   "peerDependencies": {
     "esbuild": "^0.14.21"
   },
@@ -28,5 +31,8 @@
     "postcss": "^8.4.6",
     "postcss-modules": "^4.3.0",
     "tmp": "^0.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
