@@ -1,10 +1,12 @@
+@import url(./deep/styles/hello.modules.css);
+
 .hello-world {
   color: red;
   background: url("../components/world.jpg");
 }
 
 .hello-world:hover {
-  background-image: url(../components//world2.jpg);
+  background-image: url(../components/world2.jpg);
 }
 
 .some-other-selector {

@@ -15,30 +15,36 @@ const cssHandler = require('@parcel/css');
 const camelCase = require('lodash/camelCase');
 
 const getAbsoluteUrl = (resolveDir, url) => {
-  return path.resolve(resolveDir, url.replace(/\"/g, '').replace(/\'/g, ''));
+  const pureUrl = url.replace(/\"/g, '').replace(/\'/g, '');
+  if (path.isAbsolute(pureUrl) || pureUrl.startsWith('http')) {
+    return pureUrl;
+  }
+  return path.resolve(resolveDir, pureUrl);
 };
 
 const buildCssModulesJS2 = async (cssFullPath) => {
   const resolveDir = path.dirname(cssFullPath);
-  const cssContent = await readFile(cssFullPath);
-  const transformConfig = {
-    filename: path.basename(cssFullPath),
-    code: cssContent,
+
+  /**
+   * @type {import('@parcel/css').BundleOptions}
+   */
+  const bundleConfig = {
+    filename: cssFullPath,
     minify: false,
     sourceMap: true,
     cssModules: true,
     analyzeDependencies: true
   };
-  const { code, exports, map, dependencies } = cssHandler.transform(transformConfig);
+  const { code, exports = {}, map, dependencies = [] } = cssHandler.bundle(bundleConfig);
+
   const cssModulesJSON = {};
   Object.keys(exports).forEach((originClass) => {
     cssModulesJSON[camelCase(originClass)] = exports[originClass].name;
   });
-  const classNames = JSON.stringify(cssModulesJSON);
-  const jsContent = `
-    export default ${classNames};    
-  `;
-  const urls = dependencies?.filter((d) => d.type === 'url') ?? [];
+  const classNames = JSON.stringify(cssModulesJSON, null, 2);
+
+  const urls = dependencies.filter((d) => d.type === 'url');
+
   let finalCssContent = code.toString('utf-8');
   urls.forEach(({ url, placeholder }) => {
     finalCssContent = finalCssContent.replace(
@@ -46,6 +52,9 @@ const buildCssModulesJS2 = async (cssFullPath) => {
       getAbsoluteUrl(resolveDir, url)
     );
   });
+
+  const jsContent = `export default ${classNames};`;
+
   if (map) {
     finalCssContent += `\n/*# sourceMappingURL=data:application/json;base64,${map.toString(
       'base64'
@@ -155,7 +164,8 @@ const CssModulesPlugin = (options = {}) => {
             .join(path.posix.sep)}";\n${jsContent}`;
 
           return {
-            contents: jsFileContent
+            contents: jsFileContent,
+            loader: 'js'
           };
         });
 
