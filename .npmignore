@@ -1,4 +1,5 @@
-dist
+dist/
 package-lock.json
-.idea
-.github
+.idea/
+.github/
+test/
