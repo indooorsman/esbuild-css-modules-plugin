@@ -58,7 +58,6 @@ const buildCssModulesJS2 = async (cssFullPath) => {
       getAbsoluteUrl(resolveDir, url)
     );
   });
-  Object.keys(exports)
 
   const jsContent = `export default ${classNames};`;
 
