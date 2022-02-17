@@ -24,6 +24,7 @@ const getAbsoluteUrl = (resolveDir, url) => {
 
 const buildCssModulesJS2 = async (cssFullPath) => {
   const resolveDir = path.dirname(cssFullPath);
+  const classPrefix = path.basename(cssFullPath, path.extname(cssFullPath)).replace(/\./g, '-') + '__';
 
   /**
    * @type {import('@parcel/css').BundleOptions}
@@ -36,22 +37,28 @@ const buildCssModulesJS2 = async (cssFullPath) => {
     analyzeDependencies: true
   };
   const { code, exports = {}, map, dependencies = [] } = cssHandler.bundle(bundleConfig);
+  
+  let finalCssContent = code.toString('utf-8');
 
   const cssModulesJSON = {};
   Object.keys(exports).forEach((originClass) => {
-    cssModulesJSON[camelCase(originClass)] = exports[originClass].name;
+    const patchedClass = exports[originClass].name;
+    cssModulesJSON[camelCase(originClass)] = classPrefix + patchedClass;
+    finalCssContent = finalCssContent.replace(
+      new RegExp(patchedClass, 'g'),
+      classPrefix + patchedClass
+    )
   });
   const classNames = JSON.stringify(cssModulesJSON, null, 2);
 
   const urls = dependencies.filter((d) => d.type === 'url');
-
-  let finalCssContent = code.toString('utf-8');
   urls.forEach(({ url, placeholder }) => {
     finalCssContent = finalCssContent.replace(
       new RegExp(`${placeholder}`, 'g'),
       getAbsoluteUrl(resolveDir, url)
     );
   });
+  Object.keys(exports)
 
   const jsContent = `export default ${classNames};`;
 
