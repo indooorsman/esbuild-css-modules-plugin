@@ -45,8 +45,8 @@ const buildCssModulesJS2 = async (cssFullPath) => {
     const patchedClass = exports[originClass].name;
     cssModulesJSON[camelCase(originClass)] = classPrefix + patchedClass;
     finalCssContent = finalCssContent.replace(
-      new RegExp(patchedClass, 'g'),
-      classPrefix + patchedClass
+      new RegExp(`\\.${patchedClass}`, 'g'),
+      '.' + classPrefix + patchedClass
     )
   });
   const classNames = JSON.stringify(cssModulesJSON, null, 2);
