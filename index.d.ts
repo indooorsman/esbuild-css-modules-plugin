@@ -1,16 +1,20 @@
 import type { Plugin } from 'esbuild';
 
-declare type GenerateScopedNameFunction = (
-  name: string,
-  filename: string,
-  css: string
-) => string;
+declare type GenerateScopedNameFunction = (name: string, filename: string, css: string) => string;
 
 declare type LocalsConventionFunction = (
   originalClassName: string,
   generatedClassName: string,
   inputFile: string
 ) => string;
+
+declare class Loader {
+  constructor(root: string, plugins: Plugin[]);
+
+  fetch(file: string, relativeTo: string, depTrace: string): Promise<{ [key: string]: string }>;
+
+  finalSource?: string | undefined;
+}
 
 declare interface CssModulesOptions {
   getJSON?(cssFilename: string, json: { [name: string]: string }, outputFilename?: string): void;
@@ -44,6 +48,8 @@ declare interface PluginOptions {
   v2?: boolean;
 }
 
-export default function CssModulesPlugin(options?: PluginOptions): Plugin;
+declare function CssModulesPlugin(options?: PluginOptions): Plugin;
+
+declare namespace CssModulesPlugin {}
 
 export = CssModulesPlugin;
