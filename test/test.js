@@ -14,9 +14,7 @@ fse.emptyDirSync('./dist');
     external: ['react', 'react-dom'],
     outdir: './dist/bundle-default',
     write: true,
-    plugins: [
-      cssModulesPlugin()
-    ],
+    plugins: [cssModulesPlugin()],
     logLevel: 'debug',
     loader: {
       '.jpg': 'file'
@@ -47,10 +45,18 @@ fse.emptyDirSync('./dist');
       '.jpg': 'file'
     }
   });
-  console.log('[test][esbuild:bundle-no-inject] done, please check `test/dist/bundle-no-inject`', '\n');
+  console.log(
+    '[test][esbuild:bundle-no-inject] done, please check `test/dist/bundle-no-inject`',
+    '\n'
+  );
 
   await esbuild.build({
-    entryPoints: ['./styles/app.modules.css', './styles/deep/styles/hello.modules.css', 'app.jsx', './components/hello.world.jsx'],
+    entryPoints: [
+      './styles/app.modules.css',
+      './styles/deep/styles/hello.modules.css',
+      'app.jsx',
+      './components/hello.world.jsx'
+    ],
     format: 'esm',
     target: ['es2020'],
     bundle: false,
@@ -74,15 +80,18 @@ fse.emptyDirSync('./dist');
     bundle: true,
     minify: false,
     sourcemap: true,
-    publicPath: '/static/',
+    publicPath: 'https://my.domain/static/',
     external: ['react', 'react-dom'],
     outdir: './dist/bundle-v2',
     write: true,
     loader: {
       '.jpg': 'file'
     },
-    plugins: [cssModulesPlugin({ v2: true })],
+    plugins: [cssModulesPlugin({ 
+      v2: true,
+      inject: '#my-custom-element-with-shadow-dom' 
+    })],
     logLevel: 'debug'
   });
-  console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2`', '\n')
+  console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2`', '\n');
 })();

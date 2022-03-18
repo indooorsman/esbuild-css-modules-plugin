@@ -1,3 +1,4 @@
 .hello-text {
   color: red;
+  background: url(../../../components/world.jpg);
 }
