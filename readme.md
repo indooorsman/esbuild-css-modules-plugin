@@ -25,7 +25,7 @@ yarn add -D esbuild-css-modules-plugin
 
 ## Usage
 
-````js
+```js
 const esbuild = require('esbuild');
 const cssModulesPlugin = require('esbuild-css-modules-plugin');
 
@@ -60,4 +60,4 @@ esbuild.build({
     })
   ]
 });
-````
+```
