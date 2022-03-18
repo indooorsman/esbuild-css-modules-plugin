@@ -50,6 +50,8 @@ declare interface PluginOptions {
 
 declare function CssModulesPlugin(options?: PluginOptions): Plugin;
 
-declare namespace CssModulesPlugin {}
+declare namespace CssModulesPlugin {
+  export type Options = PluginOptions;
+}
 
 export = CssModulesPlugin;
