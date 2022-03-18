@@ -1,5 +1,3 @@
-@import url(./deep/styles/hello.modules.css);
-
 .hello-world {
   color: red;
   background: url("../components/world.jpg");

@@ -41,7 +41,7 @@ declare interface CssModulesOptions {
 }
 
 declare interface PluginOptions {
-  inject?: boolean;
+  inject?: boolean | string | ((css: string, digest: string) => string);
   localsConvention?: CssModulesOptions['localsConvention'];
   generateScopedName?: CssModulesOptions['generateScopedName'];
   cssModulesOption?: CssModulesOptions;
@@ -50,6 +50,8 @@ declare interface PluginOptions {
 
 declare function CssModulesPlugin(options?: PluginOptions): Plugin;
 
-declare namespace CssModulesPlugin {}
+declare namespace CssModulesPlugin {
+  export type Options = PluginOptions;
+}
 
 export = CssModulesPlugin;
