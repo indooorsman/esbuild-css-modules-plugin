@@ -42,7 +42,6 @@ declare interface CssModulesOptions {
 
 declare interface PluginOptions {
   inject?: boolean | string | ((css: string, digest: string) => string);
-  injectEvent?: string;
   localsConvention?: CssModulesOptions['localsConvention'];
   generateScopedName?: CssModulesOptions['generateScopedName'];
   cssModulesOption?: CssModulesOptions;
