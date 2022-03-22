@@ -1,3 +1,13 @@
+## V2.2.6
+- refine some logs
+- handle `onResolve` for `.modules.css` files to add `sideEffects: true` & `namespace` to the resolve result
+- better support `watch` mode
+
+## V2.2.5
+- refactor a lot, **v2** will not generate temporary folders/files anymore
+- **v2** now support auto inject generated css into page
+- inject for and only for **v2** can be set to a css selector of the element which you want to inject css to, if the element can't be found then inject to document.head
+
 ## V2.1.4:
 
 - [v2] add filename as class prefix, e.g.: `.some-class` in `some.module.css` will be transformed to `.some-module__some-class-[hash]`
