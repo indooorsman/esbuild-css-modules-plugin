@@ -1,4 +1,4 @@
-import type { Plugin } from 'esbuild';
+import type { Plugin, PluginBuild } from 'esbuild';
 
 declare type GenerateScopedNameFunction = (name: string, filename: string, css: string) => string;
 
@@ -47,12 +47,28 @@ declare interface PluginOptions {
   generateScopedName?: CssModulesOptions['generateScopedName'];
   cssModulesOption?: CssModulesOptions;
   v2?: boolean;
+  root?: string;
+  package?: {
+    name: string,
+    main?: string,
+    module?: string,
+    version?: string
+  }
+}
+
+declare interface BuildContext {
+  buildId: string;
+  buildRoot: string;
+  packageRoot?: string;
 }
 
 declare function CssModulesPlugin(options?: PluginOptions): Plugin;
 
 declare namespace CssModulesPlugin {
   export type Options = PluginOptions;
+  export interface Build extends PluginBuild {
+    context: BuildContext;
+  }
 }
 
 export = CssModulesPlugin;

@@ -8,15 +8,15 @@ const { pluginName } = require('./lib/utils');
 const CssModulesPlugin = (options = {}) => {
   return {
     name: pluginName,
-    setup(build) {
+    setup: async (build) => {
       const { bundle } = build.initialOptions;
       const { v2 } = options;
       const useV2 = v2 && bundle;
 
       if (useV2) {
-        plugin.setup(build, options);
+        await plugin.setup(build, options);
       } else {
-        pluginV1.setup(build, options);
+        await pluginV1.setup(build, options);
       }
     }
   };
