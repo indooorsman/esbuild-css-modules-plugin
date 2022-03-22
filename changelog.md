@@ -1,7 +1,7 @@
 ## V2.2.6
-- refine some logs
-- handle `onResolve` for `.modules.css` files to add `sideEffects: true` & `namespace` to the resolve result
-- better support `watch` mode
+- **[v2]** refine some logs
+- **[v2]** handle `onResolve` for `.modules.css` files to add `sideEffects: true` & `namespace` to the resolve result
+- **[v2]** better support `watch` mode
 
 ## V2.2.5
 - refactor a lot, **v2** will not generate temporary folders/files anymore
