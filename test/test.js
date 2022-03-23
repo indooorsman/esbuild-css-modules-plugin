@@ -73,7 +73,9 @@ fse.emptyDirSync('./dist');
   console.log('[test][esbuild:no-bundle] done, please check `test/dist/no-bundle`', '\n');
 
   await esbuild.build({
-    entryPoints: ['app.jsx'],
+    entryPoints: {
+      ['custom-entry-name']: 'app.jsx'
+    },
     entryNames: '[name]-[hash]',
     format: 'esm',
     target: ['es2020'],

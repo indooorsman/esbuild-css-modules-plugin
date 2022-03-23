@@ -1,6 +1,7 @@
-## V2.2.7
+## V2.2.8
 - **[v2]** refine some logs
 - **[v2]** make hash of outputs stable
+- **[v2]** support `entryPoints` as object
 
 ## V2.2.6
 - **[v2]** refine some logs
