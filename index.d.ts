@@ -59,6 +59,8 @@ declare interface BuildContext {
   buildId: string;
   buildRoot: string;
   packageRoot?: string;
+  log: (...args: any[]) => void;
+  relative: (to: string) => `.${string}`;
 }
 
 declare function CssModulesPlugin(options?: PluginOptions): Plugin;

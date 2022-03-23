@@ -1,3 +1,7 @@
+## V2.2.7
+- **[v2]** refine some logs
+- **[v2]** make hash of outputs stable
+
 ## V2.2.6
 - **[v2]** refine some logs
 - **[v2]** handle `onResolve` for `.modules.css` files to add `sideEffects: true` & `namespace` to the resolve result
