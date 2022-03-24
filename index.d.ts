@@ -1,4 +1,5 @@
-import type { Plugin, PluginBuild } from 'esbuild';
+import type { OnLoadResult, Plugin, PluginBuild } from 'esbuild';
+import BuildCache from './lib/cache';
 
 declare type GenerateScopedNameFunction = (name: string, filename: string, css: string) => string;
 
@@ -48,11 +49,11 @@ declare interface PluginOptions {
   v2?: boolean;
   root?: string;
   package?: {
-    name: string,
-    main?: string,
-    module?: string,
-    version?: string
-  }
+    name: string;
+    main?: string;
+    module?: string;
+    version?: string;
+  };
 }
 
 declare interface BuildContext {
@@ -61,6 +62,7 @@ declare interface BuildContext {
   packageRoot?: string;
   log: (...args: any[]) => void;
   relative: (to: string) => `.${string}`;
+  cache: BuildCache;
 }
 
 declare function CssModulesPlugin(options?: PluginOptions): Plugin;
