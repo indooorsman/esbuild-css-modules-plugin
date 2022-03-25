@@ -1,3 +1,7 @@
+## V2.2.10
+- **[v2]** refine cache logic
+- **[v2]** replace fs sync methods to promises
+
 ## V2.2.8
 - **[v2]** refine some logs
 - **[v2]** make hash of outputs stable
