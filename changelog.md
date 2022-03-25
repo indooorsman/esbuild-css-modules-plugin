@@ -1,3 +1,6 @@
+## V2.2.11
+- replace `process.memoryUsage.rss()` to `process.memoryUsage().rss` to support Nodejs<15.6.0
+
 ## V2.2.10
 - **[v2]** refine cache logic
 - **[v2]** replace fs sync methods with promises
