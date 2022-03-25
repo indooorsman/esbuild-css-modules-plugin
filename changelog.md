@@ -1,6 +1,6 @@
 ## V2.2.10
 - **[v2]** refine cache logic
-- **[v2]** replace fs sync methods to promises
+- **[v2]** replace fs sync methods with promises
 
 ## V2.2.8
 - **[v2]** refine some logs
