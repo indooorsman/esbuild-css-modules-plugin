@@ -106,7 +106,7 @@ fse.emptyDirSync('./dist');
     target: ['esnext'],
     bundle: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: 'external',
     publicPath: 'https://my.domain/static/',
     external: ['react', 'react-dom'],
     outdir: './dist/bundle-v2-custom-inject',
