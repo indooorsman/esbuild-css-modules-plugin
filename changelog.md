@@ -1,3 +1,8 @@
+## V2.2.12
+- only use cache in watch mode
+- refine inject logic
+- add example of custom inject to tests
+
 ## V2.2.11
 - replace `process.memoryUsage.rss()` to `process.memoryUsage().rss` to support Nodejs<15.6.0
 

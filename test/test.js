@@ -78,9 +78,9 @@ fse.emptyDirSync('./dist');
     },
     entryNames: '[name]-[hash]',
     format: 'esm',
-    target: ['es2020'],
+    target: ['esnext'],
     bundle: true,
-    minify: false,
+    minify: true,
     sourcemap: true,
     publicPath: 'https://my.domain/static/',
     external: ['react', 'react-dom'],
@@ -98,10 +98,45 @@ fse.emptyDirSync('./dist');
   console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-inject`', '\n');
 
   await esbuild.build({
+    entryPoints: {
+      ['custom-entry-name']: 'app.jsx'
+    },
+    entryNames: '[name]-[hash]',
+    format: 'esm',
+    target: ['esnext'],
+    bundle: true,
+    minify: false,
+    sourcemap: true,
+    publicPath: 'https://my.domain/static/',
+    external: ['react', 'react-dom'],
+    outdir: './dist/bundle-v2-custom-inject',
+    write: true,
+    loader: {
+      '.jpg': 'dataurl'
+    },
+    plugins: [cssModulesPlugin({ 
+      v2: true,
+      inject: (css, digest) => {
+        return `
+          const styleId = 'style_${digest}';
+          if (!document.getElementById(styleId)) {
+            const styleEle = document.createElement('style');
+            styleEle.id = styleId;
+            styleEle.textContent = \`${css.replace(/\n/g, '')}\`;
+            document.head.appendChild(styleEle);
+          }
+        `
+      } 
+    })],
+    logLevel: 'debug'
+  });
+  console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-custom-inject`', '\n');
+
+  await esbuild.build({
     entryPoints: ['app.jsx'],
     entryNames: '[name]-[hash]',
     format: 'esm',
-    target: ['es2020'],
+    target: ['esnext'],
     bundle: true,
     minify: false,
     sourcemap: true,
