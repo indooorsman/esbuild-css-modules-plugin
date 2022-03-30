@@ -1,3 +1,5 @@
+## V2.2.13
+- **[v2]** [bugfix] exports of entry js are lost with auto inject
 ## V2.2.12
 - **[v2]** only use cache in watch mode
 - **[v2]** refine inject logic
