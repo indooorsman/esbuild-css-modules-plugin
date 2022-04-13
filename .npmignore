@@ -1,5 +1,4 @@
 dist/
-package-lock.json
 .idea/
 .github/
 test/
