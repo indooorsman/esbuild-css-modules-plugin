@@ -1,8 +1,10 @@
 {
   "name": "esbuild-css-modules-plugin",
-  "version": "2.2.15",
+  "version": "2.2.16",
   "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
-  "main": "index.js",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "type": "commonjs",
   "keywords": [
     "esbuild",
     "plugin",
@@ -16,18 +18,18 @@
   "repository": "https://github.com/indooorsman/esbuild-css-modules-plugin.git",
   "scripts": {
     "test": "cd ./test && node test.js",
-    "pub": "npm_config_registry=\"https://registry.npmjs.org/\" npm publish --userconfig ~/.pubnpmrc  --access public"
+    "pub": "npm_config_registry=https://registry.npmjs.org/ npm publish --userconfig ~/.pubnpmrc  --access public"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
-    "esbuild": "^0.14.27"
+    "esbuild": "^0.14.38"
   },
   "peerDependencies": {
-    "esbuild": "^0.14.27"
+    "esbuild": "^0.14.38"
   },
   "dependencies": {
     "@parcel/css": "1.7.3",
-    "fs-extra": "^10.0.1",
+    "fs-extra": "^10.1.0",
     "lodash": "^4.17.21",
     "postcss": "^8.4.12",
     "postcss-modules": "^4.3.1",
