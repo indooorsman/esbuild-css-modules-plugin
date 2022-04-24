@@ -1,3 +1,10 @@
+## V2.2.16
+
+> commit: 6d0cc68
+
+**V2**: pass relative path to `@parcel/css` as filename to keep hash stable in different machines
+
+
 ## V2.2.13
 - **[v2]** [bugfix] exports of entry js are lost with auto inject
 ## V2.2.12
