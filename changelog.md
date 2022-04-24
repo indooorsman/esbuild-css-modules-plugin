@@ -2,7 +2,7 @@
 
 > commit: [6d0cc68](https://github.com/indooorsman/esbuild-css-modules-plugin/commit/6d0cc68ba51ed0f31d37894c4e3afec203b44d3d)
 
-**V2**: pass relative path to `@parcel/css` as filename to keep hash stable in different machines
+- **V2**: pass relative path to `@parcel/css` as filename to keep hash stable in different machines
 
 
 ## V2.2.13
