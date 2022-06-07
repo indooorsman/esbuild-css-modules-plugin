@@ -1,3 +1,8 @@
+## V2.3.0
+
+- **V2**: upgrade `@parcel/css` to `1.9.0`
+- **V2**: add a new option `v2CssModulesOption`, refer to <https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0> 
+
 ## V2.2.16
 
 > commit: [6d0cc68](https://github.com/indooorsman/esbuild-css-modules-plugin/commit/6d0cc68ba51ed0f31d37894c4e3afec203b44d3d)

@@ -47,6 +47,19 @@ declare interface PluginOptions {
   generateScopedName?: CssModulesOptions['generateScopedName'];
   cssModulesOption?: CssModulesOptions;
   v2?: boolean;
+  v2CssModulesOption?: {
+    /**
+     * refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
+     */
+    dashedIndents?: boolean;
+    /**
+     * The currently supported segments are:
+     * [name] - the base name of the CSS file, without the extension
+     * [hash] - a hash of the full file path
+     * [local] - the original class name
+     */
+    pattern?: string;
+  };
   root?: string;
   package?: {
     name: string;
