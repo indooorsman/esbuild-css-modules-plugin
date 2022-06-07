@@ -58,14 +58,14 @@ esbuild.build({
 
       v2: true, // experimental. v2 can bundle images in css, note if set `v2` to true, other options except `inject` will be ignored. and v2 only works with `bundle: true`.
       v2CssModulesOption: { // Optional.
-        dashedIndents: boolean; // Optional. refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
+        dashedIndents: false, // Optional. refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
         /**
          * Optional. The currently supported segments are:
          * [name] - the base name of the CSS file, without the extension
          * [hash] - a hash of the full file path
          * [local] - the original class name
          */
-        pattern: string;
+        pattern: `custom-prefix_[local]_[hash]`
       }
     })
   ]
