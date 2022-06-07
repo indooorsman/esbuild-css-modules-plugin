@@ -1,3 +1,7 @@
+## V2.3.1
+
+- Fix [issue#33](https://github.com/indooorsman/esbuild-css-modules-plugin/issues/33)
+
 ## V2.3.0
 
 - **V2**: upgrade `@parcel/css` to `1.9.0`
