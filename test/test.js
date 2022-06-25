@@ -74,7 +74,8 @@ fse.emptyDirSync('./dist');
 
   await esbuild.build({
     entryPoints: {
-      ['custom-entry-name']: 'app.jsx'
+      ['custom-entry-name']: 'app.jsx',
+      ['named-exports']: 'named-exports.jsx'
     },
     entryNames: '[name]-[hash]',
     format: 'esm',
@@ -99,7 +100,8 @@ fse.emptyDirSync('./dist');
 
   await esbuild.build({
     entryPoints: {
-      ['custom-entry-name']: 'app.jsx'
+      ['custom-entry-name']: 'app.jsx',
+      ['named-exports']: 'named-exports.jsx'
     },
     entryNames: '[name]-[hash]',
     format: 'esm',
@@ -133,7 +135,7 @@ fse.emptyDirSync('./dist');
   console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-custom-inject`', '\n');
 
   await esbuild.build({
-    entryPoints: ['app.jsx'],
+    entryPoints: ['app.jsx', 'named-exports.jsx'],
     entryNames: '[name]-[hash]',
     format: 'esm',
     target: ['esnext'],
