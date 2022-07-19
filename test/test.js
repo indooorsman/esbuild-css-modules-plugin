@@ -90,9 +90,9 @@ fse.emptyDirSync('./dist');
     loader: {
       '.jpg': 'file'
     },
-    plugins: [cssModulesPlugin({ 
+    plugins: [cssModulesPlugin({
       v2: true,
-      inject: '#my-custom-element-with-shadow-dom' 
+      inject: '#my-custom-element-with-shadow-dom'
     })],
     logLevel: 'debug'
   });
@@ -116,7 +116,7 @@ fse.emptyDirSync('./dist');
     loader: {
       '.jpg': 'dataurl'
     },
-    plugins: [cssModulesPlugin({ 
+    plugins: [cssModulesPlugin({
       v2: true,
       inject: (css, digest) => {
         return `
@@ -128,7 +128,7 @@ fse.emptyDirSync('./dist');
             document.head.appendChild(styleEle);
           }
         `
-      } 
+      }
     })],
     logLevel: 'debug'
   });
@@ -149,11 +149,34 @@ fse.emptyDirSync('./dist');
     loader: {
       '.jpg': 'file'
     },
-    plugins: [cssModulesPlugin({ 
+    plugins: [cssModulesPlugin({
       v2: true,
       inject: false
     })],
     logLevel: 'debug'
   });
   console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-no-inject`', '\n');
+
+  await esbuild.build({
+    entryPoints: ['filter.jsx'],
+    entryNames: '[name]-[hash]',
+    format: 'esm',
+    target: ['esnext'],
+    bundle: true,
+    minify: false,
+    sourcemap: true,
+    publicPath: 'https://my.domain/static/',
+    external: ['react', 'react-dom'],
+    outdir: './dist/bundle-v2-filter',
+    write: true,
+    loader: {
+      '.jpg': 'file'
+    },
+    plugins: [cssModulesPlugin({
+      v2: true,
+      filter: /\.css$/i,
+    })],
+    logLevel: 'debug'
+  });
+  console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-filter`', '\n');
 })();
