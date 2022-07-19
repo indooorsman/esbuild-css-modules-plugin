@@ -51,6 +51,8 @@ esbuild.build({
 
       generateScopedName: (name, filename, css) => string, // optional. refer to: https://github.com/madyankin/postcss-modules#generating-scoped-names
 
+      filter: /\.modules?\.css$/i // Optional. Regex to filter certain CSS files.
+
       cssModulesOption: {
         // optional, refer to: https://github.com/madyankin/postcss-modules/blob/d7cefc427c43bf35f7ebc55e7bda33b4689baf5a/index.d.ts#L27
         // this option will override others passed to postcss-modules

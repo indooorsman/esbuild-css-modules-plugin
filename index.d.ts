@@ -46,6 +46,7 @@ declare interface PluginOptions {
   localsConvention?: CssModulesOptions['localsConvention'];
   generateScopedName?: CssModulesOptions['generateScopedName'];
   cssModulesOption?: CssModulesOptions;
+  filter?: RegExp;
   v2?: boolean;
   v2CssModulesOption?: {
     /**
