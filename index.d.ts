@@ -74,6 +74,7 @@ declare interface BuildContext {
   buildId: string;
   buildRoot: string;
   packageRoot?: string;
+  packageVersion: string;
   log: (...args: any[]) => void;
   relative: (to: string) => `.${string}`;
   cache: BuildCache;
