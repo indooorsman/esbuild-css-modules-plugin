@@ -1,3 +1,12 @@
+## V2.5.0
+
+- upgrade `@parcel/css` to `1.12.0`
+- validate class name, js keywords are considered to be invalid, e.g. `.default { } .const { }` will throw error during building
+
+## V2.4.0
+
+- Add filter option: Regular expression used to match CSS module files by @christianvuerings in #40
+
 ## V2.3.1
 
 - Fix [issue#33](https://github.com/indooorsman/esbuild-css-modules-plugin/issues/33)
@@ -5,7 +14,7 @@
 ## V2.3.0
 
 - **V2**: upgrade `@parcel/css` to `1.9.0`
-- **V2**: add a new option `v2CssModulesOption`, refer to <https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0> 
+- **V2**: add a new option `v2CssModulesOption`, refer to <https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0>
 
 ## V2.2.16
 
@@ -13,32 +22,39 @@
 
 - **V2**: pass relative path to `@parcel/css` as filename to keep hash stable in different machines
 
-
 ## V2.2.13
+
 - **[v2]** [bugfix] exports of entry js are lost with auto inject
+
 ## V2.2.12
+
 - **[v2]** only use cache in watch mode
 - **[v2]** refine inject logic
 - **[v2]** add example of custom inject to tests
 
 ## V2.2.11
+
 - replace `process.memoryUsage.rss()` to `process.memoryUsage().rss` to support Nodejs<15.6.0
 
 ## V2.2.10
+
 - **[v2]** refine cache logic
 - **[v2]** replace fs sync methods with promises
 
 ## V2.2.8
+
 - **[v2]** refine some logs
 - **[v2]** make hash of outputs stable
 - **[v2]** support `entryPoints` as object
 
 ## V2.2.6
+
 - **[v2]** refine some logs
 - **[v2]** handle `onResolve` for `.modules.css` files to add `sideEffects: true` & `namespace` to the resolve result
 - **[v2]** better support `watch` mode
 
 ## V2.2.5
+
 - refactor a lot, **v2** will not generate temporary folders/files anymore
 - **v2** now support auto inject generated css into page
 - inject for and only for **v2** can be set to a css selector of the element which you want to inject css to, if the element can't be found then inject to document.head

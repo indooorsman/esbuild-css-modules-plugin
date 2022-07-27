@@ -1,6 +1,6 @@
 {
   "name": "esbuild-css-modules-plugin",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -28,7 +28,7 @@
     "esbuild": "^0.14.38"
   },
   "dependencies": {
-    "@parcel/css": "1.9.0",
+    "@parcel/css": "^1.12.0",
     "fs-extra": "^10.1.0",
     "lodash": "^4.17.21",
     "postcss": "^8.4.12",
