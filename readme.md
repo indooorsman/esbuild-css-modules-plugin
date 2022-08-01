@@ -57,7 +57,18 @@ esbuild.build({
         // optional, refer to: https://github.com/madyankin/postcss-modules/blob/d7cefc427c43bf35f7ebc55e7bda33b4689baf5a/index.d.ts#L27
         // this option will override others passed to postcss-modules
       },
-
+      postcssPlugins: [
+        // optional array of postcss plugins
+        // example:
+        // postcssPlugins: [
+        //   require('postcss-modules-values-replace')(),
+        //   require('postcss-color-function')(),
+        //   require('postcss-calc')(),
+        //   require('autoprefixer')({
+        //     overrideBrowserslist: ['last 2 versions']
+        //   })
+        // ],
+      ],
       v2: true, // experimental. v2 can bundle images in css, note if set `v2` to true, other options except `inject` will be ignored. and v2 only works with `bundle: true`.
       v2CssModulesOption: { // Optional.
         dashedIndents: false, // Optional. refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
