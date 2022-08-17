@@ -1,6 +1,6 @@
 {
   "name": "esbuild-css-modules-plugin",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -22,10 +22,10 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
-    "esbuild": "^0.14.38"
+    "esbuild": "^0.15.5"
   },
   "peerDependencies": {
-    "esbuild": "^0.14.38"
+    "esbuild": "^0.14.0 || ^0.15.0"
   },
   "dependencies": {
     "@parcel/css": "^1.12.0",
