@@ -48,6 +48,7 @@ declare interface PluginOptions {
   cssModulesOption?: CssModulesOptions;
   filter?: RegExp;
   v2?: boolean;
+  generateTsFile?: boolean;
   v2CssModulesOption?: {
     /**
      * refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
