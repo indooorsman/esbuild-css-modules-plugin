@@ -68,6 +68,7 @@ declare interface PluginOptions {
     module?: string;
     version?: string;
   };
+  usePascalCase?: boolean;
 }
 
 declare interface BuildContext {

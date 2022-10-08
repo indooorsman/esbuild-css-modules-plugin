@@ -1,3 +1,7 @@
+## V2.6.0
+- `@parcel/css` now named `lightningcss`
+- support pascal case by @FuriouZz [#43](https://github.com/indooorsman/esbuild-css-modules-plugin/pull/43)
+
 ## V2.5.0
 
 - upgrade `@parcel/css` to `1.12.0`
