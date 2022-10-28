@@ -92,7 +92,8 @@ fse.emptyDirSync('./dist');
     },
     plugins: [cssModulesPlugin({
       v2: true,
-      inject: '#my-custom-element-with-shadow-dom'
+      inject: '#my-custom-element-with-shadow-dom',
+      generateTsFile: true
     })],
     logLevel: 'debug'
   });
