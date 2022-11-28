@@ -73,7 +73,7 @@ declare interface PluginOptions {
 }
 
 declare interface BuildContext {
-  buildId: string;
+  buildId?: string;
   buildRoot: string;
   packageRoot?: string;
   packageVersion: string;
