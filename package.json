@@ -18,7 +18,7 @@
   "repository": "https://github.com/indooorsman/esbuild-css-modules-plugin.git",
   "scripts": {
     "test": "cd ./test && node test.js",
-    "pub": "npm_config_registry=https://registry.npmjs.org/ npm publish --userconfig ~/.pubnpmrc  --access public"
+    "pub": "npm_config_registry=https://registry.npmjs.org/ npm publish --userconfig ~/.pubnpmrc --access public --tag latest"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",

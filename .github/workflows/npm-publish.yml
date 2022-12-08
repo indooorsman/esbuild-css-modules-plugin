@@ -17,6 +17,6 @@ jobs:
       - run: |
           npm install --audit=false --fund=false --package-lock=false
           npm test
-          npm publish
+          npm publish --access public --tag latest
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
