@@ -1,3 +1,7 @@
+## V2.7.0
+- fix inject logic to avoid styles missing in some micro-frontend framework
+- ***Important***: there's a breaking change of inject logic, before this version the inject method would be deleted once it's called, from this verson it will ***not*** be deleted anymore, for people using custom inject method please pay attention.
+
 ## V2.6.3
 - upgrade dependencies
 - fix #45 #46, thanks to @markdalgleish
