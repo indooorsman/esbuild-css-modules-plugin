@@ -70,6 +70,8 @@ declare interface PluginOptions {
     version?: string;
   };
   usePascalCase?: boolean;
+  /** since esbuild@0.17 has removed the `watch` option, you have to set it here explicitly */
+  watch?: boolean;
 }
 
 declare interface BuildContext {

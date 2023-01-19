@@ -1,6 +1,6 @@
 {
   "name": "esbuild-css-modules-plugin",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -11,7 +11,7 @@
     "css modules"
   ],
   "engines": {
-    "node": ">= 14"
+    "node": ">= 16"
   },
   "author": "indooorsman@gmail.com",
   "license": "MIT",
@@ -22,16 +22,16 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
-    "esbuild": "^0.16.2"
+    "esbuild": "^0.17.3"
   },
   "peerDependencies": {
     "esbuild": "*"
   },
   "dependencies": {
-    "lightningcss": "^1.17.1",
+    "lightningcss": "^1.18.0",
     "fs-extra": "^10.1.0",
     "lodash": "^4.17.21",
-    "postcss": "^8.4.19",
+    "postcss": "^8.4.21",
     "postcss-modules": "^6.0.0",
     "tmp": "^0.2.1"
   },
