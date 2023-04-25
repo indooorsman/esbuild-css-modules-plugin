@@ -1,183 +1,116 @@
-const esbuild = require('esbuild');
-const cssModulesPlugin = require('../index.js');
-const fse = require('fs-extra');
-fse.emptyDirSync('./dist');
+import esbuild from 'esbuild';
+import cssModulesPlugin from '../index.js';
 
 (async () => {
-  await esbuild.build({
-    entryPoints: ['app.jsx'],
-    format: 'esm',
-    target: ['es2020'],
-    bundle: true,
-    minify: false,
-    sourcemap: true,
-    external: ['react', 'react-dom'],
-    outdir: './dist/bundle-default',
-    write: true,
-    plugins: [cssModulesPlugin()],
-    logLevel: 'debug',
-    loader: {
-      '.jpg': 'file'
-    }
-  });
-  console.log('[test][esbuild:bundle-default] done, please check `test/dist/bundle-default`', '\n');
+  // await esbuild.build({
+  //   entryPoints: {
+  //     ['custom-entry-name']: 'app.jsx',
+  //     ['named-exports']: 'named-exports.jsx'
+  //   },
+  //   entryNames: '[name]-[hash]',
+  //   format: 'esm',
+  //   target: ['esnext'],
+  //   bundle: true,
+  //   minify: false,
+  //   sourcemap: true,
+  //   publicPath: 'https://my.domain/static/',
+  //   external: ['react', 'react-dom'],
+  //   outdir: './dist/bundle-v2-inject',
+  //   write: true,
+  //   loader: {
+  //     '.jpg': 'file'
+  //   },
+  //   plugins: [cssModulesPlugin({
+  //     inject: '#my-custom-element-with-shadow-dom',
+  //     generateTsFile: true
+  //   })],
+  //   logLevel: 'debug'
+  // });
+  // console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-inject`', '\n');
 
-  await esbuild.build({
-    entryPoints: ['app.jsx'],
-    format: 'esm',
-    target: ['es2020'],
-    bundle: true,
-    minify: false,
-    sourcemap: true,
-    external: ['react', 'react-dom'],
-    outdir: './dist/bundle-no-inject',
-    write: true,
-    plugins: [
-      cssModulesPlugin({
-        inject: false,
-        cssModulesOption: {
-          generateScopedName: '[path][name]__[local]___[hash:base64:8]'
-        }
-      })
-    ],
-    logLevel: 'debug',
-    loader: {
-      '.jpg': 'file'
-    }
-  });
-  console.log(
-    '[test][esbuild:bundle-no-inject] done, please check `test/dist/bundle-no-inject`',
-    '\n'
-  );
+  // await esbuild.build({
+  //   entryPoints: {
+  //     ['custom-entry-name']: 'app.jsx',
+  //     ['named-exports']: 'named-exports.jsx'
+  //   },
+  //   entryNames: '[name]-[hash]',
+  //   format: 'esm',
+  //   target: ['esnext'],
+  //   bundle: true,
+  //   minify: false,
+  //   sourcemap: 'external',
+  //   publicPath: 'https://my.domain/static/',
+  //   external: ['react', 'react-dom'],
+  //   outdir: './dist/bundle-v2-custom-inject',
+  //   write: true,
+  //   loader: {
+  //     '.jpg': 'dataurl'
+  //   },
+  //   plugins: [cssModulesPlugin({
+  //     inject: (css, digest) => {
+  //       return `
+  //         const styleId = 'style_${digest}';
+  //         if (!document.getElementById(styleId)) {
+  //           const styleEle = document.createElement('style');
+  //           styleEle.id = styleId;
+  //           styleEle.textContent = \`${css.replace(/\n/g, '')}\`;
+  //           document.head.appendChild(styleEle);
+  //         }
+  //       `
+  //     }
+  //   })],
+  //   logLevel: 'debug'
+  // });
+  // console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-custom-inject`', '\n');
+
+  // await esbuild.build({
+  //   entryPoints: ['app.jsx', 'named-exports.jsx'],
+  //   entryNames: '[name]-[hash]',
+  //   format: 'esm',
+  //   target: ['esnext'],
+  //   bundle: true,
+  //   minify: false,
+  //   sourcemap: false,
+  //   publicPath: 'https://my.domain/static/',
+  //   external: ['react', 'react-dom'],
+  //   outdir: './dist/bundle-v2-no-inject',
+  //   write: true,
+  //   loader: {
+  //     '.jpg': 'file'
+  //   },
+  //   plugins: [
+  //     cssModulesPlugin({
+  //       inject: false
+  //     })
+  //   ],
+  //   logLevel: 'debug'
+  // });
+  // console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-no-inject`', '\n');
 
   await esbuild.build({
     entryPoints: [
-      './styles/app.modules.css',
-      './styles/deep/styles/hello.modules.css',
-      'app.jsx',
-      './components/hello.world.jsx'
+      'app.jsx'
     ],
+    entryNames: '[name]-[hash]',
     format: 'esm',
-    target: ['es2020'],
-    bundle: false,
+    target: ['esnext'],
+    bundle: true,
+    external: ['react', 'react-dom'],
     minify: false,
     sourcemap: false,
-    outdir: './dist/no-bundle',
-    write: true,
-    plugins: [cssModulesPlugin()],
-    logLevel: 'debug',
-    loader: {
-      '.jpg': 'file'
-    }
-  });
-  console.log('[test][esbuild:no-bundle] done, please check `test/dist/no-bundle`', '\n');
-
-  await esbuild.build({
-    entryPoints: {
-      ['custom-entry-name']: 'app.jsx',
-      ['named-exports']: 'named-exports.jsx'
-    },
-    entryNames: '[name]-[hash]',
-    format: 'esm',
-    target: ['esnext'],
-    bundle: true,
-    minify: true,
-    sourcemap: true,
     publicPath: 'https://my.domain/static/',
-    external: ['react', 'react-dom'],
-    outdir: './dist/bundle-v2-inject',
+    outdir: './dist/bundle-v3',
     write: true,
     loader: {
       '.jpg': 'file'
     },
-    plugins: [cssModulesPlugin({
-      v2: true,
-      inject: '#my-custom-element-with-shadow-dom',
-      generateTsFile: true
-    })],
+    plugins: [
+      cssModulesPlugin({
+        bundle: true,
+        localsConvention: 'camelCase'
+      })
+    ],
     logLevel: 'debug'
   });
-  console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-inject`', '\n');
-
-  await esbuild.build({
-    entryPoints: {
-      ['custom-entry-name']: 'app.jsx',
-      ['named-exports']: 'named-exports.jsx'
-    },
-    entryNames: '[name]-[hash]',
-    format: 'esm',
-    target: ['esnext'],
-    bundle: true,
-    minify: false,
-    sourcemap: 'external',
-    publicPath: 'https://my.domain/static/',
-    external: ['react', 'react-dom'],
-    outdir: './dist/bundle-v2-custom-inject',
-    write: true,
-    loader: {
-      '.jpg': 'dataurl'
-    },
-    plugins: [cssModulesPlugin({
-      v2: true,
-      inject: (css, digest) => {
-        return `
-          const styleId = 'style_${digest}';
-          if (!document.getElementById(styleId)) {
-            const styleEle = document.createElement('style');
-            styleEle.id = styleId;
-            styleEle.textContent = \`${css.replace(/\n/g, '')}\`;
-            document.head.appendChild(styleEle);
-          }
-        `
-      }
-    })],
-    logLevel: 'debug'
-  });
-  console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-custom-inject`', '\n');
-
-  await esbuild.build({
-    entryPoints: ['app.jsx', 'named-exports.jsx'],
-    entryNames: '[name]-[hash]',
-    format: 'esm',
-    target: ['esnext'],
-    bundle: true,
-    minify: false,
-    sourcemap: true,
-    publicPath: 'https://my.domain/static/',
-    external: ['react', 'react-dom'],
-    outdir: './dist/bundle-v2-no-inject',
-    write: true,
-    loader: {
-      '.jpg': 'file'
-    },
-    plugins: [cssModulesPlugin({
-      v2: true,
-      inject: false
-    })],
-    logLevel: 'debug'
-  });
-  console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-no-inject`', '\n');
-
-  await esbuild.build({
-    entryPoints: ['filter.jsx'],
-    entryNames: '[name]-[hash]',
-    format: 'esm',
-    target: ['esnext'],
-    bundle: true,
-    minify: false,
-    sourcemap: true,
-    publicPath: 'https://my.domain/static/',
-    external: ['react', 'react-dom'],
-    outdir: './dist/bundle-v2-filter',
-    write: true,
-    loader: {
-      '.jpg': 'file'
-    },
-    plugins: [cssModulesPlugin({
-      v2: true,
-      filter: /\.css$/i,
-    })],
-    logLevel: 'debug'
-  });
-  console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-filter`', '\n');
+  console.log('[test][esbuild:bundle:v3] done, please check `test/dist/bundle-v3`', '\n');
 })();

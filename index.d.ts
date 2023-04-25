@@ -1,96 +1,55 @@
-import type { OnLoadResult, Plugin, PluginBuild } from 'esbuild';
-import BuildCache from './lib/cache';
+import type { Plugin, PluginBuild } from 'esbuild';
 
-declare type GenerateScopedNameFunction = (name: string, filename: string, css: string) => string;
-
-declare type LocalsConventionFunction = (
-  originalClassName: string,
-  generatedClassName: string,
-  inputFile: string
-) => string;
-
-declare class Loader {
-  constructor(root: string, plugins: Plugin[]);
-
-  fetch(file: string, relativeTo: string, depTrace: string): Promise<{ [key: string]: string }>;
-
-  finalSource?: string | undefined;
-}
-
-declare interface CssModulesOptions {
-  getJSON?(cssFilename: string, json: { [name: string]: string }, outputFilename?: string): void;
-
-  localsConvention?:
-    | 'camelCase'
-    | 'camelCaseOnly'
-    | 'dashes'
-    | 'dashesOnly'
-    | LocalsConventionFunction;
-
-  scopeBehaviour?: 'global' | 'local';
-  globalModulePaths?: RegExp[];
-
-  generateScopedName?: string | GenerateScopedNameFunction;
-
-  hashPrefix?: string;
-  exportGlobals?: boolean;
-  root?: string;
-
-  Loader?: typeof Loader;
-
-  resolve?: (file: string) => string | Promise<string>;
-}
-
-declare interface PluginOptions {
+export interface Options {
   inject?: boolean | string | ((css: string, digest: string) => string);
-  localsConvention?: CssModulesOptions['localsConvention'];
-  generateScopedName?: CssModulesOptions['generateScopedName'];
-  cssModulesOption?: CssModulesOptions;
   filter?: RegExp;
-  v2?: boolean;
+  bundle?: boolean;
   generateTsFile?: boolean;
-  v2CssModulesOption?: {
-    /**
-     * refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
-     */
-    dashedIndents?: boolean;
-    /**
-     * The currently supported segments are:
-     * [name] - the base name of the CSS file, without the extension
-     * [hash] - a hash of the full file path
-     * [local] - the original class name
-     */
-    pattern?: string;
-  };
+  /**
+   * refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
+   */
+  dashedIndents?: boolean;
+  /**
+   * The currently supported segments are:
+   * [name] - the base name of the CSS file, without the extension
+   * [hash] - a hash of the full file path
+   * [local] - the original class name
+   */
+  pattern?: string;
+  /**
+   * localsConvention  
+   * default is `camelCaseOnly`  
+   * **cameCase** : `.some-class-name` ==> `someClassName`, the original class name will not to be removed from the locals  
+   * **camelCaseOnly**: `.some-class-name` ==> `someClassName`, the original class name will be removed from the locals  
+   * **pascalCase** : `.some-class-name` ==> `SomeClassName`, the original class name will not to be removed from the locals  
+   * **pascalCaseOnly**: `.some-class-name` ==> `SomeClassName`, the original class name will be removed from the locals  
+   */
+  localsConvention?: 'camelCase' | 'pascalCase' | 'camelCaseOnly' | 'pascalCaseOnly';
   root?: string;
   package?: {
     name: string;
     main?: string;
     module?: string;
-    version?: string;
+    version: string;
   };
   usePascalCase?: boolean;
   /** since esbuild@0.17 has removed the `watch` option, you have to set it here explicitly */
   watch?: boolean;
 }
 
-declare interface BuildContext {
+interface BuildContext {
   buildId: string;
   buildRoot: string;
   packageRoot?: string;
-  packageVersion: string;
+  packageVersion?: string;
   log: (...args: any[]) => void;
-  relative: (to: string) => `.${string}`;
-  cache: BuildCache;
+  relative: (to: string) => string;
 }
 
-declare function CssModulesPlugin(options?: PluginOptions): Plugin;
+declare function CssModulesPlugin(options?: Options): Plugin;
 
-declare namespace CssModulesPlugin {
-  export type Options = PluginOptions;
-  export interface Build extends PluginBuild {
-    context: BuildContext;
-  }
+export interface Build extends PluginBuild {
+  context: BuildContext;
 }
 
-export = CssModulesPlugin;
+export default CssModulesPlugin;

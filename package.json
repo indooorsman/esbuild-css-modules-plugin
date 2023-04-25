@@ -1,39 +1,37 @@
 {
   "name": "esbuild-css-modules-plugin",
-  "version": "2.7.1",
+  "version": "3.0.0-dev.0",
   "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
   "main": "./index.js",
+  "module": "./index.js",
   "types": "./index.d.ts",
-  "type": "commonjs",
+  "type": "module",
   "keywords": [
     "esbuild",
     "plugin",
     "css modules"
   ],
   "engines": {
-    "node": ">= 16"
+    "node": ">= 16.20.0"
   },
   "author": "indooorsman@gmail.com",
   "license": "MIT",
   "repository": "https://github.com/indooorsman/esbuild-css-modules-plugin.git",
   "scripts": {
-    "test": "cd ./test && node test.js",
+    "test": "cd ./test && rm -rf ./dist && node test.js",
     "pub": "npm_config_registry=https://registry.npmjs.org/ npm publish --userconfig ~/.pubnpmrc --access public --tag latest"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.7",
     "@types/node": "^17.0.23",
-    "esbuild": "^0.17.3"
+    "esbuild": "^0.17.18"
   },
   "peerDependencies": {
     "esbuild": "*"
   },
   "dependencies": {
-    "lightningcss": "^1.18.0",
-    "fs-extra": "^10.1.0",
-    "lodash": "^4.17.21",
-    "postcss": "^8.4.21",
-    "postcss-modules": "^6.0.0",
-    "tmp": "^0.2.1"
+    "lightningcss": "^1.20.0",
+    "lodash-es": "^4.17.21"
   },
   "publishConfig": {
     "access": "public"

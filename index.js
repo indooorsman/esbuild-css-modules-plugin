@@ -1,25 +1,16 @@
-const pluginV1 = require('./lib/v1');
-const plugin = require('./lib/plugin');
-const { pluginName } = require('./lib/utils');
+import { setup } from './lib/plugin.js';
+import { pluginName } from './lib/utils.js';
 
 /**
- * @type {(options: import('.').Options) => import('esbuild').Plugin}
+ * @type {(options: import('./index.js').Options) => import('esbuild').Plugin}
  */
 const CssModulesPlugin = (options = {}) => {
   return {
     name: pluginName,
     setup: async (build) => {
-      const { bundle } = build.initialOptions;
-      const { v2 } = options;
-      const useV2 = v2 && bundle;
-
-      if (useV2) {
-        await plugin.setup(build, options);
-      } else {
-        await pluginV1.setup(build, options);
-      }
+      await setup(build, options);
     }
   };
 };
 
-module.exports = CssModulesPlugin;
+export default CssModulesPlugin;

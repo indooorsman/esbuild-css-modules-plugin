@@ -4,13 +4,20 @@
     "noEmit": true,
     "declaration": true,
     "allowJs": true,
+    "checkJs": true,
+    "strict": true,
     "lib": [
-      "ES2021",
-      "ES2021.WeakRef"
+      "ES2022"
     ],
-    "target": "ES2021",
-    "moduleResolution": "Node",
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
-  }
+  },
+  "include": [
+    "index.js",
+    "lib/**/*"
+  ]
 }

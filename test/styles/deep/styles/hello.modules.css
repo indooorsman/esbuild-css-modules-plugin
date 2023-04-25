@@ -1,4 +1,4 @@
 .hello-text {
-  color: red;
-  background: url(../../../components/world.jpg);
+  composes: bg-red from "../../base.modules.css";
+  color: white;
 }
