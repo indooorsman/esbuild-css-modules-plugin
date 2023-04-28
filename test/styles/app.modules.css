@@ -11,3 +11,6 @@
   background-image: url('../components/world.jpg');
 }
 
+.var {
+  color: red;
+}

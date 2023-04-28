@@ -6,5 +6,6 @@ export const HelloWorld = () => (
   <>
     <h3 className={styles.helloWorld}>Hello World!</h3>
     <p className={styles2.helloText}>hi...</p>
+    <p className={styles.var}>...</p>
   </>
 );

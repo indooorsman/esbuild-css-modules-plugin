@@ -88,9 +88,7 @@ import cssModulesPlugin from '../index.js';
   // console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-no-inject`', '\n');
 
   await esbuild.build({
-    entryPoints: [
-      'app.jsx'
-    ],
+    entryPoints: ['app.jsx'],
     entryNames: '[name]-[hash]',
     format: 'esm',
     target: ['esnext'],
@@ -106,9 +104,10 @@ import cssModulesPlugin from '../index.js';
     },
     plugins: [
       cssModulesPlugin({
-        inject: () => {
-          console.log('TODO');
-        }
+        // inject: (css, digest) => {
+        //   return `console.log("${css}", "${digest}");`
+        // },
+        inject: '#my-styles-container'
       })
     ],
     logLevel: 'debug'
