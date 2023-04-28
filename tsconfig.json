@@ -11,6 +11,7 @@
     ],
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
+    "module": "NodeNext",
     "target": "ES2022",
     "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,

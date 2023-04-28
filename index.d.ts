@@ -3,8 +3,8 @@ import type { Plugin, PluginBuild } from 'esbuild';
 export interface Options {
   inject?: boolean | string | ((css: string, digest: string) => string);
   filter?: RegExp;
-  bundle?: boolean;
-  generateTsFile?: boolean;
+  // bundle?: boolean; // currently always true to support composes easily
+  // generateTsFile?: boolean;
   /**
    * refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
    */
@@ -32,9 +32,6 @@ export interface Options {
     module?: string;
     version: string;
   };
-  usePascalCase?: boolean;
-  /** since esbuild@0.17 has removed the `watch` option, you have to set it here explicitly */
-  watch?: boolean;
 }
 
 interface BuildContext {
@@ -42,6 +39,7 @@ interface BuildContext {
   buildRoot: string;
   packageRoot?: string;
   packageVersion?: string;
+  injectorPath?: string;
   log: (...args: any[]) => void;
   relative: (to: string) => string;
 }

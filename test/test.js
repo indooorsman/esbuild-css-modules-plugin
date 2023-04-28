@@ -97,7 +97,7 @@ import cssModulesPlugin from '../index.js';
     bundle: true,
     external: ['react', 'react-dom'],
     minify: false,
-    sourcemap: false,
+    sourcemap: true,
     publicPath: 'https://my.domain/static/',
     outdir: './dist/bundle-v3',
     write: true,
@@ -106,8 +106,9 @@ import cssModulesPlugin from '../index.js';
     },
     plugins: [
       cssModulesPlugin({
-        bundle: true,
-        localsConvention: 'camelCase'
+        inject: () => {
+          console.log('TODO');
+        }
       })
     ],
     logLevel: 'debug'
