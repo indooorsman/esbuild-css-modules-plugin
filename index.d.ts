@@ -25,6 +25,17 @@ export interface Options {
    * **pascalCaseOnly**: `.some-class-name` ==> `SomeClassName`, the original class name will be removed from the locals  
    */
   localsConvention?: 'camelCase' | 'pascalCase' | 'camelCaseOnly' | 'pascalCaseOnly';
+  /**
+   * namedExports
+   * @default false
+   * @description
+   * e.g.:
+   * ```
+   * export const someClassName = '.some-class-name__hauajsk';
+   * ```
+   * Note: `someClassName` can not be a js key word like `const`, `var` & etc.
+   */
+  namedExports?: boolean;
   root?: string;
   package?: {
     name: string;

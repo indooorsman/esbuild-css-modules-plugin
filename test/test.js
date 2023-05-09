@@ -88,14 +88,19 @@ import cssModulesPlugin from '../index.js';
   // console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-no-inject`', '\n');
 
   await esbuild.build({
-    entryPoints: ['app.jsx'],
-    entryNames: '[name]-[hash]',
+    entryPoints: [
+      'app.jsx',
+      'components/hello.world.jsx',
+      'styles/app.modules.css',
+      'styles/deep/styles/hello.modules.css'
+    ],
+    entryNames: '[dir]/[name]',
     format: 'esm',
     target: ['esnext'],
-    bundle: true,
-    external: ['react', 'react-dom'],
+    // bundle: true,
+    // external: ['react', 'react-dom'],
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     publicPath: 'https://my.domain/static/',
     outdir: './dist/bundle-v3',
     write: true,
@@ -104,8 +109,10 @@ import cssModulesPlugin from '../index.js';
     },
     plugins: [
       cssModulesPlugin({
+        // namedExports: true,
+        // inject: true
         // inject: (css, digest) => {
-        //   return `console.log("${css}", "${digest}");`
+        //   return `console.log(${css}, ${digest});`
         // },
         inject: '#my-styles-container'
       })
