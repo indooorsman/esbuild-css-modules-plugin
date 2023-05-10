@@ -17,12 +17,12 @@ export interface Options {
    */
   pattern?: string;
   /**
-   * localsConvention  
-   * default is `camelCaseOnly`  
-   * **cameCase** : `.some-class-name` ==> `someClassName`, the original class name will not to be removed from the locals  
-   * **camelCaseOnly**: `.some-class-name` ==> `someClassName`, the original class name will be removed from the locals  
-   * **pascalCase** : `.some-class-name` ==> `SomeClassName`, the original class name will not to be removed from the locals  
-   * **pascalCaseOnly**: `.some-class-name` ==> `SomeClassName`, the original class name will be removed from the locals  
+   * localsConvention
+   * default is `camelCaseOnly`
+   * **cameCase** : `.some-class-name` ==> `someClassName`, the original class name will not to be removed from the locals
+   * **camelCaseOnly**: `.some-class-name` ==> `someClassName`, the original class name will be removed from the locals
+   * **pascalCase** : `.some-class-name` ==> `SomeClassName`, the original class name will not to be removed from the locals
+   * **pascalCaseOnly**: `.some-class-name` ==> `SomeClassName`, the original class name will be removed from the locals
    */
   localsConvention?: 'camelCase' | 'pascalCase' | 'camelCaseOnly' | 'pascalCaseOnly';
   /**
@@ -33,7 +33,9 @@ export interface Options {
    * ```
    * export const someClassName = '.some-class-name__hauajsk';
    * ```
-   * Note: `someClassName` can not be a js key word like `const`, `var` & etc.
+   * Notes:
+   * - `someClassName` can not be a js key word like `const`, `var` & etc.
+   * - cannot be used with `inject`
    */
   namedExports?: boolean;
   root?: string;

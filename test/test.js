@@ -90,15 +90,15 @@ import cssModulesPlugin from '../index.js';
   await esbuild.build({
     entryPoints: [
       'app.jsx',
-      'components/hello.world.jsx',
-      'styles/app.modules.css',
-      'styles/deep/styles/hello.modules.css'
+      // 'components/hello.world.jsx',
+      // 'styles/app.modules.css',
+      // 'styles/deep/styles/hello.modules.css'
     ],
     entryNames: '[dir]/[name]',
     format: 'esm',
     target: ['esnext'],
-    // bundle: true,
-    // external: ['react', 'react-dom'],
+    bundle: true,
+    external: ['react', 'react-dom'],
     minify: false,
     sourcemap: false,
     publicPath: 'https://my.domain/static/',
