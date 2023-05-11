@@ -1,6 +1,6 @@
 {
   "name": "esbuild-css-modules-plugin",
-  "version": "3.0.0-dev.3",
+  "version": "3.0.0-dev.4",
   "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
   "main": "./index.js",
   "module": "./index.js",
