@@ -100,7 +100,7 @@ import cssModulesPlugin from '../index.js';
     target: ['esnext'],
     bundle: true,
     external: ['react', 'react-dom'],
-    minify: true,
+    minify: false,
     sourcemap: false,
     publicPath: 'https://my.cdn/static/',
     outdir: './dist/bundle-v3',

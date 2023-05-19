@@ -15,8 +15,6 @@ import {
 import { compact } from 'lodash-es';
 import { readFile, writeFile } from 'node:fs/promises';
 
-// TODO not generate inject code on load, but on end
-
 /**
  * @type {(options: import('./index.js').Options) => import('esbuild').Plugin}
  */

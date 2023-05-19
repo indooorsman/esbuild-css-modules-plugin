@@ -1,4 +1,6 @@
-.hello-world {
+.hello-world,
+.helloWorld,
+.hello_world {
   color: red;
   background: url("../components/world.jpg");
 }
