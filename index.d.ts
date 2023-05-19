@@ -1,10 +1,10 @@
 import type { Plugin, PluginBuild } from 'esbuild';
 
 export interface Options {
+  /** force to build modules-css files even if `bundle` is disabled in esbuild, default is `false` */
+  force?: boolean;
   inject?: boolean | string | ((css: string, digest: string) => string);
   filter?: RegExp;
-  // bundle?: boolean; // currently always true to support composes easily
-  // generateTsFile?: boolean;
   /**
    * refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
    */
@@ -38,7 +38,6 @@ export interface Options {
    * - cannot be used with `inject`
    */
   namedExports?: boolean;
-  root?: string;
   package?: {
     name: string;
     main?: string;
@@ -48,13 +47,14 @@ export interface Options {
 }
 
 interface BuildContext {
+  options: Options;
   buildId: string;
   buildRoot: string;
-  packageRoot?: string;
-  packageVersion?: string;
-  injectorPath?: string;
+  packageName: string;
+  packageVersion: string;
   log: (...args: any[]) => void;
   relative: (to: string) => string;
+  normalizedEntries: string[];
 }
 
 declare function CssModulesPlugin(options?: Options): Plugin;

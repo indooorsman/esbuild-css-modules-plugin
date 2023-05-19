@@ -87,7 +87,7 @@ import cssModulesPlugin from '../index.js';
   // });
   // console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-no-inject`', '\n');
 
-  await esbuild.build({
+  const buildOptions = {
     entryPoints: [
       'app.jsx',
       // 'components/hello.world.jsx',
@@ -95,13 +95,14 @@ import cssModulesPlugin from '../index.js';
       // 'styles/deep/styles/hello.modules.css'
     ],
     entryNames: '[dir]/[name]',
+    assetNames: '[dir]/[name]',
     format: 'esm',
     target: ['esnext'],
     bundle: true,
     external: ['react', 'react-dom'],
-    minify: false,
+    minify: true,
     sourcemap: false,
-    publicPath: 'https://my.domain/static/',
+    publicPath: 'https://my.cdn/static/',
     outdir: './dist/bundle-v3',
     write: true,
     loader: {
@@ -109,7 +110,8 @@ import cssModulesPlugin from '../index.js';
     },
     plugins: [
       cssModulesPlugin({
-        // namedExports: true,
+        // force: true,
+        // namedExports: true
         // inject: true
         // inject: (css, digest) => {
         //   return `console.log(${css}, ${digest});`
@@ -118,6 +120,10 @@ import cssModulesPlugin from '../index.js';
       })
     ],
     logLevel: 'debug'
-  });
+  };
+
+  await esbuild.build(buildOptions);
+  // const ctx = await esbuild.context(buildOptions);
+  // await ctx.watch();
   console.log('[test][esbuild:bundle:v3] done, please check `test/dist/bundle-v3`', '\n');
 })();

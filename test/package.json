@@ -1,6 +1,6 @@
 {
   "name": "esbuild-css-modules-plugin-test",
-  "version": "0.0.0",
+  "version": "3.0.0-dev",
   "private": true,
   "type": "module"
 }

@@ -1,4 +1,4 @@
 .hello-text {
   composes: bg-red from "../../base.modules.css";
-  color: white;
+  color: grey;
 }

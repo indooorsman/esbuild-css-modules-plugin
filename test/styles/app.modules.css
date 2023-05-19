@@ -3,6 +3,10 @@
   background: url("../components/world.jpg");
 }
 
+.hello-world img {
+  display: inline-block;
+}
+
 .hello-world:hover {
   background-image: url(../components/world2.jpg);
 }
