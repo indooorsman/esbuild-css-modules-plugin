@@ -1,6 +1,5 @@
 import { basename, dirname, extname, normalize, relative, resolve, sep } from 'node:path';
 import { CSSTransformer, CSSInjector } from './lib/css.helper.js';
-import { prepareBuild } from './lib/plugin.js';
 import {
   contentPlaceholder,
   digestPlaceholder,
@@ -10,10 +9,12 @@ import {
   pluginCssNamespace,
   pluginJsNamespace,
   pluginName,
-  simpleMinifyCss
+  simpleMinifyCss,
+  validateOptions
 } from './lib/utils.js';
 import { compact } from 'lodash-es';
 import { readFile, writeFile } from 'node:fs/promises';
+import { patchContext } from './lib/context.js';
 
 /**
  * @type {(options: import('./index.js').Options) => import('esbuild').Plugin}
@@ -24,9 +25,14 @@ const CssModulesPlugin = (_options) => {
     setup: (build) => {
       build.initialOptions.metafile = true;
       const options = _options || {};
-      const patchedBuild = prepareBuild(build, options);
+      validateOptions(options);
+
+      const patchedBuild = patchContext(build, options);
+      const { log, buildId, buildRoot } = patchedBuild.context;
+      log(`initialize build context with options:`, options);
+      log(`root of this build(#${buildId}):`, buildRoot);
+
       const modulesCssRegExp = getModulesCssRegExp(options);
-      const { buildRoot, log, buildId } = patchedBuild.context;
       const bundle = patchedBuild.initialOptions.bundle ?? false;
       const forceBuild = options.force ?? false;
       const injectCss = options.inject ?? false;
