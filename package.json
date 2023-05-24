@@ -2,10 +2,18 @@
   "name": "esbuild-css-modules-plugin",
   "version": "3.0.0-dev.9",
   "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
-  "main": "./index.js",
+  "main": "./index.cjs",
   "module": "./index.js",
   "types": "./index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.cjs",
+      "default": "./index.js"
+    }
+  },
   "keywords": [
     "esbuild",
     "plugin",
@@ -31,7 +39,8 @@
   },
   "dependencies": {
     "lightningcss": "^1.20.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "lodash": "^4.17.21"
   },
   "publishConfig": {
     "access": "public"
