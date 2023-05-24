@@ -63,4 +63,4 @@ export interface Build extends PluginBuild {
   context: BuildContext;
 }
 
-export default CssModulesPlugin;
+export = CssModulesPlugin;
