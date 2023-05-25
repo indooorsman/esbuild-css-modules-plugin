@@ -180,7 +180,7 @@ const CssModulesPlugin = (_options) => {
                   let newContent = content;
                   Object.entries(places).forEach(([f, t]) => {
                     log(`fix import path in ${js}: ${f} ===> ${t}`);
-                    newContent = newContent.replace(f, t);
+                    newContent = newContent.replaceAll(f, t);
                   });
                   return newContent;
                 })
