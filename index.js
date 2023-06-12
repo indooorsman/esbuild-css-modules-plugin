@@ -162,7 +162,8 @@ export const setup = (build, _options) => {
           meta.imports?.forEach((imp) => {
             if (modulesCssRegExp.test(imp.path)) {
               shouldPush = true;
-              defines[imp.path] = imp.path.replace(/\.css$/i, outJsExt);
+              const impExt = extname(imp.path);
+              defines[imp.path] = imp.path.replace(new RegExp(`${impExt}$`), `${outJsExt}`);
             }
           });
           if (shouldPush) {
