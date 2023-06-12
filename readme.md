@@ -1,6 +1,6 @@
 # esbuild-css-modules-plugin
 
-[![npm version](https://img.shields.io/npm/v/esbuild-css-modules-plugin.svg?v=2.5.0)](https://www.npmjs.com/package/esbuild-css-modules-plugin)
+[![npm version](https://img.shields.io/npm/v/esbuild-css-modules-plugin/v3-dev)](https://www.npmjs.com/package/esbuild-css-modules-plugin/v/v3-dev)
 [![Test](https://github.com/indooorsman/esbuild-css-modules-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/indooorsman/esbuild-css-modules-plugin/actions/workflows/test.yml)
 
 A esbuild plugin to bundle css modules into js(x)/ts(x).
@@ -14,62 +14,97 @@ See [`./test/test.js`](https://github.com/indooorsman/esbuild-css-modules-plugin
 ## Install
 
 ```shell
-npm i -D esbuild-css-modules-plugin
+npm i -D esbuild-css-modules-plugin@v3-dev
 ```
 
 or
 
 ```shell
-yarn add -D esbuild-css-modules-plugin
+yarn add -D esbuild-css-modules-plugin@v3-dev
 ```
 
 ## Usage
 
-````js
-const esbuild = require('esbuild');
-const cssModulesPlugin = require('esbuild-css-modules-plugin');
+```js
+import esbuild from 'esbuild';
+import CssModulesPlugin from 'esbuild-css-modules-plugin';
 
 esbuild.build({
   plugins: [
-    cssModulesPlugin({
-      // optional. set to false to not inject generated css into page;
-      // default value is false when set `v2` to `true`, otherwise default is true,
-      // if set to `true`, the generated css will be injected into `head`;
-      // could be a string of css selector of the element to inject into,
-      // e.g.
-      // ```
-      // inject: '#some-element-id' // the plugin will try to get `shadowRoot` of the found element, and append css to the `shadowRoot`, if no shadowRoot then append to the found element, if no element found then append to document.head
-      // ```
-      // could be a function with params content & digest (return a string of js code to inject to page),
-      // e.g.
-      // ```
-      // inject: (cssContent, digest) => `console.log("${cssContent}", "${digest}")`
-      // ```
+    CssModulesPlugin({
+      /** optional, force to build modules-css files even if `bundle` is disabled in esbuild. default is `false` */
+      force: false,
+      /** optional, inline images imported in css as data url even if `bundle` is false. default is `false` */
+      forceInlineImages: false,
+      /** optional, generate declaration file for css file. default is `false` */
+      emitDeclarationFile: false,
+      /**
+       * optional
+       * @see https://lightningcss.dev/css-modules.html#local-css-variables
+       */
+      dashedIndents: false,
+      /**
+       * optional, pattern of class names
+       * The currently supported segments are:
+       * [name] - the base name of the CSS file, without the extension
+       * [hash] - a hash of the full file path
+       * [local] - the original class name
+       * @see https://lightningcss.dev/css-modules.html#custom-naming-patterns
+       */
+      pattern: '[name]_[local]_[hash]',
+      /**
+       * optional, localsConvention
+       * default is `camelCaseOnly`
+       * **cameCase** : `.some-class-name` ==> `someClassName`, the original class name will not to be removed from the locals
+       * **camelCaseOnly**: `.some-class-name` ==> `someClassName`, the original class name will be removed from the locals
+       * **pascalCase** : `.some-class-name` ==> `SomeClassName`, the original class name will not to be removed from the locals
+       * **pascalCaseOnly**: `.some-class-name` ==> `SomeClassName`, the original class name will be removed from the locals
+       */
+      localsConvention: 'camelCase' | 'pascalCase' | 'camelCaseOnly' | 'pascalCaseOnly',
+      /**
+       * optional, enable named exports
+       * @default false
+       * @description
+       * e.g.:
+       * ```
+       * export const someClassName = '.some-class-name__hauajsk';
+       * ```
+       * Notes:
+       * - `someClassName` can **NOT** be a js key word like `const`, `var` & etc.
+       * - can **NOT** be used with `inject`
+       */
+      namedExports: false,
+      // optional, package info
+      package: {
+        name: 'my-lib',
+        main: 'index.cjs',
+        module: 'index.js',
+        version: '3.0.0'
+      },
+      /**
+       * optional. set to false to not inject generated css into page;
+       * if set to `true`, the generated css will be injected into `head`;
+       * could be a string of css selector of the element to inject into,
+       * e.g.
+       *
+       * ```
+       * inject: '#some-element-id' // the plugin will try to get `shadowRoot` of the found element, and append css to the
+       * `shadowRoot`, if no shadowRoot then append to the found element, if no element found then append to document.head
+       *
+       * ```
+       *
+       * could be a function with params content & digest (return a string of js code to inject css into page),
+       * e.g.
+       *
+       * ```
+       * inject: (content, digest) => `console.log(${content}, ${digest})`
+       * ```
+       */
       inject: false,
 
-      localsConvention: 'camelCaseOnly', // optional. value could be one of 'camelCaseOnly', 'camelCase', 'dashes', 'dashesOnly', default is 'camelCaseOnly'
-
-      generateScopedName: (name, filename, css) => string, // optional. refer to: https://github.com/madyankin/postcss-modules#generating-scoped-names
-
-      filter: /\.modules?\.css$/i // Optional. Regex to filter certain CSS files.
-
-      cssModulesOption: {
-        // optional, refer to: https://github.com/madyankin/postcss-modules/blob/d7cefc427c43bf35f7ebc55e7bda33b4689baf5a/index.d.ts#L27
-        // this option will override others passed to postcss-modules
-      },
-
-      v2: true, // experimental. v2 can bundle images in css, note if set `v2` to true, other options except `inject` will be ignored. and v2 only works with `bundle: true`.
-      v2CssModulesOption: { // Optional.
-        dashedIndents: false, // Optional. refer to: https://github.com/parcel-bundler/parcel-css/releases/tag/v1.9.0
-        /**
-         * Optional. The currently supported segments are:
-         * [name] - the base name of the CSS file, without the extension
-         * [hash] - a hash of the full file path
-         * [local] - the original class name
-         */
-        pattern: `custom-prefix_[local]_[hash]`
-      }
+      /** Optional. Regex to filter certain CSS files. */
+      filter: /\.modules?\.css$/i
     })
   ]
 });
-````
+```
