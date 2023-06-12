@@ -7,13 +7,13 @@
     "checkJs": true,
     "strict": true,
     "lib": [
-      "ES2022"
+      "ESNext"
     ],
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "module": "NodeNext",
-    "target": "ES2022",
-    "moduleResolution": "nodenext",
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
   },

@@ -1,6 +1,6 @@
 import type { Plugin, PluginBuild } from 'esbuild';
 
-export interface Options {
+declare interface BuildOptions {
   /** force to build modules-css files even if `bundle` is disabled in esbuild, default is `false` */
   force?: boolean;
   /** inline images imported in css as data url even if `bundle` is false */
@@ -49,21 +49,27 @@ export interface Options {
   };
 }
 
-interface BuildContext {
-  options: Options;
-  buildId: string;
-  buildRoot: string;
-  packageName: string;
-  packageVersion: string;
-  log: (...args: any[]) => void;
-  relative: (to: string) => string;
-  normalizedEntries: string[];
+declare function CssModulesPlugin(options?: BuildOptions): Plugin;
+
+declare namespace CssModulesPlugin {
+  export interface Options extends BuildOptions {};
+  
+  export interface BuildContext {
+    options: Options;
+    buildId: string;
+    buildRoot: string;
+    packageName: string;
+    packageVersion: string;
+    log: (...args: any[]) => void;
+    relative: (to: string) => string;
+    normalizedEntries: string[];
+  }
+
+  export type setup = (build: PluginBuild, options: Options) => void;
+
+  export interface Build extends PluginBuild {
+    context: BuildContext;
+  }
 }
 
-declare function CssModulesPlugin(options?: Options): Plugin;
-
-export type setup = (build: PluginBuild, options: Options) => void;
-
-export interface Build extends PluginBuild {
-  context: BuildContext;
-}
+export = CssModulesPlugin;
