@@ -3,6 +3,7 @@ import { CSSTransformer, CSSInjector } from './lib/css.helper.js';
 import {
   contentPlaceholder,
   digestPlaceholder,
+  ensureFile,
   genDigest,
   getModulesCssRegExp,
   injectorVirtualPath,
@@ -38,6 +39,7 @@ export const setup = (build, _options) => {
   const jsLoader = patchedBuild.initialOptions.loader?.['.js'] ?? 'js';
   const outJsExt = patchedBuild.initialOptions.outExtension?.['.js'] ?? '.js';
   const forceInlineImages = !!options.forceInlineImages;
+  const emitDts = !!options.emitDeclarationFile;
 
   patchedBuild.onLoad({ filter: /.+/, namespace: pluginCssNamespace }, (args) => {
     const { path } = args;
@@ -90,22 +92,31 @@ export const setup = (build, _options) => {
       .replace(/[^a-zA-Z0-9]/g, '-')
       .replace(/^\-*/, '');
     const suffix = patchedBuild.context.packageVersion?.replace(/[^a-zA-Z0-9]/g, '') ?? '';
-    CSSTransformer.getInstance(patchedBuild).bundle(path, { prefix, suffix, forceInlineImages });
+    CSSTransformer.getInstance(patchedBuild).bundle(path, {
+      prefix,
+      suffix,
+      forceInlineImages,
+      emitDeclarationFile: emitDts
+    });
 
     if (!bundle && !forceBuild) {
       return undefined;
     } else if (!bundle && forceBuild) {
       const buildResult = CSSTransformer.getInstance(patchedBuild).getCachedResult(path);
 
-      const outdir = resolve(buildRoot, patchedBuild.initialOptions.outdir ?? '');
-      const outbase = patchedBuild.initialOptions.outbase;
-      let outfile = resolve(outdir, rpath) + outJsExt;
-      if (outbase) {
-        let normalized = normalize(outbase);
-        if (normalized.endsWith(sep)) {
-          normalized = compact(normalized.split(sep)).join(sep);
+      if (emitDts) {
+        const outdir = resolve(buildRoot, patchedBuild.initialOptions.outdir ?? '');
+        const outbase = patchedBuild.initialOptions.outbase;
+        let outDtsfile = resolve(outdir, rpath) + '.d.ts';
+        if (outbase) {
+          let normalized = normalize(outbase);
+          if (normalized.endsWith(sep)) {
+            normalized = compact(normalized.split(sep)).join(sep);
+          }
+          outDtsfile = resolve(outDtsfile.replace(normalized, ''));
         }
-        outfile = resolve(outfile.replace(normalized, ''));
+
+        ensureFile(outDtsfile, buildResult?.dts ?? '');
       }
 
       if (injectCss) {

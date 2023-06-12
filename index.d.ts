@@ -5,6 +5,7 @@ export interface Options {
   force?: boolean;
   /** inline images imported in css as data url even if `bundle` is false */
   forceInlineImages?: boolean;
+  emitDeclarationFile?: boolean;
   inject?: boolean | string | ((css: string, digest: string) => string);
   filter?: RegExp;
   /**
@@ -66,5 +67,3 @@ export type setup = (build: PluginBuild, options: Options) => void;
 export interface Build extends PluginBuild {
   context: BuildContext;
 }
-
-export default CssModulesPlugin;
