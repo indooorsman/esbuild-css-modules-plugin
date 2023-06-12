@@ -3,6 +3,8 @@ import type { Plugin, PluginBuild } from 'esbuild';
 export interface Options {
   /** force to build modules-css files even if `bundle` is disabled in esbuild, default is `false` */
   force?: boolean;
+  /** inline images imported in css as data url even if `bundle` is false */
+  forceInlineImages?: boolean;
   inject?: boolean | string | ((css: string, digest: string) => string);
   filter?: RegExp;
   /**
@@ -59,8 +61,10 @@ interface BuildContext {
 
 declare function CssModulesPlugin(options?: Options): Plugin;
 
+export type setup = (build: PluginBuild, options: Options) => void;
+
 export interface Build extends PluginBuild {
   context: BuildContext;
 }
 
-export = CssModulesPlugin;
+export default CssModulesPlugin;

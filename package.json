@@ -1,6 +1,6 @@
 {
   "name": "esbuild-css-modules-plugin",
-  "version": "3.0.0-dev.13",
+  "version": "3.0.0-dev.14",
   "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
   "main": "./index.cjs",
   "module": "./index.js",
@@ -27,6 +27,7 @@
   "repository": "https://github.com/indooorsman/esbuild-css-modules-plugin.git",
   "scripts": {
     "test": "cd ./test && rm -rf ./dist && node test.js",
+    "test:cjs": "cd ./test && rm -rf ./dist && node test.cjs",
     "pub": "npm_config_registry=https://registry.npmjs.org/ npm publish --userconfig ~/.pubnpmrc --access public --tag latest"
   },
   "devDependencies": {

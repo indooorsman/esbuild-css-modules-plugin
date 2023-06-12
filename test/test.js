@@ -90,16 +90,16 @@ import cssModulesPlugin from '../index.js';
   const buildOptions = {
     entryPoints: [
       'app.jsx',
-      // 'components/hello.world.jsx',
-      // 'styles/app.modules.css',
-      // 'styles/deep/styles/hello.modules.css'
+      'components/hello.world.jsx',
+      'styles/app.modules.css',
+      'styles/deep/styles/hello.modules.css'
     ],
     entryNames: '[dir]/[name]',
     assetNames: '[dir]/[name]',
     format: 'esm',
     target: ['esnext'],
-    bundle: true,
-    external: ['react', 'react-dom'],
+    bundle: false,
+    // external: ['react', 'react-dom'],
     minify: false,
     sourcemap: false,
     publicPath: 'https://my.cdn/static/',
@@ -116,6 +116,8 @@ import cssModulesPlugin from '../index.js';
         // inject: (css, digest) => {
         //   return `console.log(${css}, ${digest});`
         // },
+        forceInlineImages: true,
+        force: true,
         inject: '#my-styles-container'
       })
     ],
