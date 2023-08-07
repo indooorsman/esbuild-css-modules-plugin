@@ -117,10 +117,10 @@ import cssModulesPlugin from '../index.js';
         //   return `console.log(${css}, ${digest});`
         // },
         emitDeclarationFile: true,
-        forceInlineImages: true,
+        // forceInlineImages: true,
         force: true,
-        namedExports: true,
-        // inject: '#my-styles-container'
+        // namedExports: true,
+        inject: '#my-styles-container'
       })
     ],
     logLevel: 'debug'

@@ -43,6 +43,7 @@ export const setup = (build, _options) => {
 
   patchedBuild.onLoad({ filter: /.+/, namespace: pluginCssNamespace }, (args) => {
     const { path } = args;
+    log(`[${pluginCssNamespace}] on load:`, args);
     const realPath = resolve(buildRoot, path.replace(`${pluginCssNamespace}:`, ''));
     return {
       contents: CSSTransformer.getInstance(patchedBuild)?.getCachedResult(realPath)?.css,
@@ -70,7 +71,7 @@ export const setup = (build, _options) => {
       const [, ns, originPath] =
         path.match(new RegExp(`^(${pluginCssNamespace}|${pluginJsNamespace}):(.+)$`)) ?? [];
 
-      log(`on resolve ${ns}:`, args);
+      log(`[${ns}] on resolve :`, args);
 
       /** @type {import('esbuild').OnResolveResult} */
       const r = { namespace: ns, path: originPath, pluginData: { ...(args.pluginData ?? {}) } };
@@ -102,6 +103,7 @@ export const setup = (build, _options) => {
     if (!bundle && !forceBuild) {
       return undefined;
     } else if (!bundle && forceBuild) {
+      log('force build modules css:', rpath);
       const buildResult = CSSTransformer.getInstance(patchedBuild).getCachedResult(path);
 
       if (emitDts) {
@@ -122,20 +124,47 @@ export const setup = (build, _options) => {
       if (injectCss) {
         return {
           contents: buildResult?.js
-            ?.replace(contentPlaceholder, simpleMinifyCss(JSON.stringify(buildResult?.css)))
+            ?.replace(
+              contentPlaceholder,
+              JSON.stringify(simpleMinifyCss(buildResult?.css, patchedBuild.esbuild))
+            )
             .replace(digestPlaceholder, JSON.stringify(genDigest(rpath, buildId))),
           loader: jsLoader,
-          watchFiles: [path],
+          watchFiles: [path, ...(buildResult?.composedFiles ?? [])],
           resolveDir: dirname(path),
           pluginData: {
             originCssPath: path
           }
         };
       } else {
+        const anotherBuildOptions = { ...patchedBuild.initialOptions };
+        delete anotherBuildOptions.entryPoints;
+        delete anotherBuildOptions.plugins;
+        delete anotherBuildOptions.outdir;
+        await patchedBuild.esbuild.build({
+          ...anotherBuildOptions,
+          absWorkingDir: buildRoot,
+          stdin: {
+            contents: buildResult?.css ?? '',
+            resolveDir: dirname(path),
+            sourcefile: rpath,
+            loader: 'css'
+          },
+          outfile: resolve(
+            buildRoot,
+            patchedBuild.initialOptions.outdir ?? '.',
+            relative(
+              patchedBuild.initialOptions.outbase ?? '.',
+              rpath.replace(/\.css$/i, '.built.css')
+            )
+          )
+        });
         return {
-          contents: buildResult?.css,
-          loader: cssLoader,
-          watchFiles: [path],
+          contents: `import './${basename(path).replace(/\.css$/i, '.built.css')}';\n${
+            buildResult?.js
+          }`,
+          loader: jsLoader,
+          watchFiles: [path, ...(buildResult?.composedFiles ?? [])],
           resolveDir: dirname(path),
           pluginData: {
             originCssPath: path
@@ -143,10 +172,11 @@ export const setup = (build, _options) => {
         };
       }
     } else if (bundle) {
+      const bundleResult = CSSTransformer.getInstance(patchedBuild).getCachedResult(path);
       return {
-        contents: CSSTransformer.getInstance(patchedBuild).getCachedResult(path)?.js,
+        contents: bundleResult?.js,
         loader: jsLoader,
-        watchFiles: [path],
+        watchFiles: [path, ...(bundleResult?.composedFiles ?? [])],
         resolveDir: dirname(path),
         pluginData: {
           originCssPath: path
@@ -227,7 +257,10 @@ export const setup = (build, _options) => {
         ])
           .then(([css, js]) => {
             const newJs = js
-              .replace(contentPlaceholder, simpleMinifyCss(JSON.stringify(css)))
+              .replace(
+                contentPlaceholder,
+                JSON.stringify(simpleMinifyCss(css, patchedBuild.esbuild))
+              )
               .replace(digestPlaceholder, JSON.stringify(genDigest(c, buildId)));
             return newJs;
           })
