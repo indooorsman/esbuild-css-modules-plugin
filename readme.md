@@ -36,7 +36,7 @@ esbuild.build({
       force: false,
       /** optional, inline images imported in css as data url even if `bundle` is false. default is `false` */
       forceInlineImages: false,
-      /** optional, generate declaration file for css file. default is `false` */
+      /** optional, generate typescript declaration file for css file to `outdir` of esbuild config. default is `false` */
       emitDeclarationFile: false,
       /**
        * optional
