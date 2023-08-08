@@ -122,11 +122,29 @@ export const setup = (build, _options) => {
       }
 
       if (injectCss) {
+        const anotherBuildOptions = { ...patchedBuild.initialOptions };
+        delete anotherBuildOptions.entryPoints;
+        delete anotherBuildOptions.plugins;
+        const { outputFiles } = await patchedBuild.esbuild.build({
+          ...anotherBuildOptions,
+          absWorkingDir: buildRoot,
+          stdin: {
+            contents: buildResult?.css ?? '',
+            resolveDir: dirname(path),
+            sourcefile: rpath,
+            loader: 'css'
+          },
+          bundle: true,
+          minify: true,
+          sourcemap: false,
+          write: false,
+          outExtension: { '.css': '.css' }
+        });
         return {
           contents: buildResult?.js
             ?.replace(
               contentPlaceholder,
-              JSON.stringify(simpleMinifyCss(buildResult?.css, patchedBuild.esbuild))
+              JSON.stringify(outputFiles.find((f) => basename(f.path) === 'stdin.css')?.text ?? '')
             )
             .replace(digestPlaceholder, JSON.stringify(genDigest(rpath, buildId))),
           loader: jsLoader,
@@ -150,6 +168,8 @@ export const setup = (build, _options) => {
             sourcefile: rpath,
             loader: 'css'
           },
+          bundle: true,
+          sourcemap: false,
           outfile: resolve(
             buildRoot,
             patchedBuild.initialOptions.outdir ?? '.',

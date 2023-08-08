@@ -87,6 +87,7 @@ import cssModulesPlugin from '../index.js';
   // });
   // console.log('[test][esbuild:bundle:v2] done, please check `test/dist/bundle-v2-no-inject`', '\n');
 
+  /** @type {import('esbuild').BuildOptions} */
   const buildOptions = {
     entryPoints: [
       'app.jsx',
