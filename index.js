@@ -14,7 +14,7 @@ import {
   validateOptions
 } from './lib/utils.js';
 import { compact } from 'lodash-es';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, rename, writeFile } from 'node:fs/promises';
 import { patchContext } from './lib/context.js';
 
 /**
@@ -39,7 +39,7 @@ export const setup = (build, _options) => {
   const jsLoader = patchedBuild.initialOptions.loader?.['.js'] ?? 'js';
   const outJsExt = patchedBuild.initialOptions.outExtension?.['.js'] ?? '.js';
   const forceInlineImages = !!options.forceInlineImages;
-  const emitDts = !!options.emitDeclarationFile;
+  const emitDts = options.emitDeclarationFile;
 
   patchedBuild.onLoad({ filter: /.+/, namespace: pluginCssNamespace }, (args) => {
     const { path } = args;
@@ -85,42 +85,52 @@ export const setup = (build, _options) => {
   );
 
   patchedBuild.onLoad({ filter: modulesCssRegExp, namespace: 'file' }, async (args) => {
+    if (!emitDts && !bundle && !forceBuild) {
+      return undefined;
+    }
+
     log('[file] on load:', args);
     const { path } = args;
     const rpath = relative(buildRoot, path);
-
     const prefix = basename(rpath, extname(path))
       .replace(/[^a-zA-Z0-9]/g, '-')
       .replace(/^\-*/, '');
     const suffix = patchedBuild.context.packageVersion?.replace(/[^a-zA-Z0-9]/g, '') ?? '';
-    CSSTransformer.getInstance(patchedBuild).bundle(path, {
+
+    const buildResult = CSSTransformer.getInstance(patchedBuild).bundle(path, {
       prefix,
       suffix,
       forceInlineImages,
-      emitDeclarationFile: emitDts
+      emitDeclarationFile: !!emitDts
     });
 
-    if (!bundle && !forceBuild) {
-      return undefined;
-    } else if (!bundle && forceBuild) {
-      log('force build modules css:', rpath);
-      const buildResult = CSSTransformer.getInstance(patchedBuild).getCachedResult(path);
-
-      if (emitDts) {
-        const outdir = resolve(buildRoot, patchedBuild.initialOptions.outdir ?? '');
-        const outbase = patchedBuild.initialOptions.outbase;
-        let outDtsfile = resolve(outdir, rpath) + '.d.ts';
+    if (emitDts) {
+      const dtsExts = [];
+      if (emitDts === '.d.css.ts' || emitDts === '.css.d.ts') {
+        dtsExts.push(emitDts);
+      } else {
+        dtsExts.push('.d.css.ts', '.css.d.ts');
+      }
+      const outdir = resolve(buildRoot, patchedBuild.initialOptions.outdir ?? '');
+      const outbase = patchedBuild.initialOptions.outbase;
+      dtsExts.forEach(async (dtsExt) => {
+        let outDtsfile = resolve(outdir, rpath).replace(/\.css$/i, dtsExt);
         if (outbase) {
           let normalized = normalize(outbase);
           if (normalized.endsWith(sep)) {
             normalized = compact(normalized.split(sep)).join(sep);
           }
-          outDtsfile = resolve(outDtsfile.replace(normalized, ''));
+          if (normalized !== '.') {
+            outDtsfile = resolve(outDtsfile.replace(normalized, ''));
+          }
         }
+        log(`emit typescript declarations file:`, patchedBuild.context.relative(outDtsfile));
+        await ensureFile(outDtsfile, buildResult?.dts ?? '');
+      });
+    }
 
-        ensureFile(outDtsfile, buildResult?.dts ?? '');
-      }
-
+    if (!bundle && forceBuild) {
+      log('force build modules css:', rpath);
       if (injectCss) {
         const anotherBuildOptions = { ...patchedBuild.initialOptions };
         delete anotherBuildOptions.entryPoints;
@@ -192,11 +202,10 @@ export const setup = (build, _options) => {
         };
       }
     } else if (bundle) {
-      const bundleResult = CSSTransformer.getInstance(patchedBuild).getCachedResult(path);
       return {
-        contents: bundleResult?.js,
+        contents: buildResult?.js,
         loader: jsLoader,
-        watchFiles: [path, ...(bundleResult?.composedFiles ?? [])],
+        watchFiles: [path, ...(buildResult?.composedFiles ?? [])],
         resolveDir: dirname(path),
         pluginData: {
           originCssPath: path
@@ -214,8 +223,14 @@ export const setup = (build, _options) => {
     if (!bundle && forceBuild) {
       /** @type {[string, Record<string, string>][]} */
       const jsFiles = [];
-      /** @type {Record<string, string>} */
+      /** @type {[string, string][]} */
+      const moduleJsFiles = [];
+
       Object.entries(r.metafile?.outputs ?? {}).forEach(([js, meta]) => {
+        if (meta.entryPoint && modulesCssRegExp.test(meta.entryPoint)) {
+          moduleJsFiles.push([meta.entryPoint, js]);
+        }
+
         if (meta.entryPoint && !modulesCssRegExp.test(meta.entryPoint)) {
           let shouldPush = false;
           /** @type {Record<string, string>} */
@@ -223,8 +238,7 @@ export const setup = (build, _options) => {
           meta.imports?.forEach((imp) => {
             if (modulesCssRegExp.test(imp.path)) {
               shouldPush = true;
-              const impExt = extname(imp.path);
-              defines[imp.path] = imp.path.replace(new RegExp(`${impExt}$`), `${outJsExt}`);
+              defines[imp.path] = imp.path + outJsExt;
             }
           });
           if (shouldPush) {
@@ -233,8 +247,15 @@ export const setup = (build, _options) => {
         }
       });
 
-      await Promise.all(
-        jsFiles.map(([js, places]) => {
+      await Promise.all([
+        ...(moduleJsFiles.map(([src, dist]) => {
+          const fp = resolve(buildRoot, dist);
+          const filename = basename(src) + outJsExt;
+          const finalPath = resolve(dirname(fp), filename);
+          log(`rename ${dist} to ${filename}`);
+          return rename(fp, finalPath);
+        })),
+        ...jsFiles.map(([js, places]) => {
           const fulljs = resolve(buildRoot, js);
           return readFile(fulljs, { encoding: 'utf8' })
             .then((content) => {
@@ -249,7 +270,7 @@ export const setup = (build, _options) => {
               return writeFile(fulljs, nc, { encoding: 'utf8' });
             });
         })
-      );
+      ]);
 
       return dispose();
     }

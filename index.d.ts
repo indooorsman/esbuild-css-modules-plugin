@@ -5,7 +5,13 @@ declare interface BuildOptions {
   force?: boolean;
   /** inline images imported in css as data url even if `bundle` is false */
   forceInlineImages?: boolean;
-  emitDeclarationFile?: boolean;
+  /**
+   * emit typescript declaration file for css modules class names
+   * - `.css.d.ts` : emit `xxx.css.d.ts`
+   * - `.d.css.ts` : emit `xxx.d.css.ts` (from typescript@5, see https://www.typescriptlang.org/tsconfig#allowArbitraryExtensions)
+   * - `true` : emit both `xxx.css.d.ts` and `xxx.d.css.ts`
+   */
+  emitDeclarationFile?: boolean | '.d.css.ts' | '.css.d.ts';
   inject?: boolean | string | ((css: string, digest: string) => string);
   filter?: RegExp;
   /**
@@ -52,8 +58,8 @@ declare interface BuildOptions {
 declare function CssModulesPlugin(options?: BuildOptions): Plugin;
 
 declare namespace CssModulesPlugin {
-  export interface Options extends BuildOptions {};
-  
+  export interface Options extends BuildOptions {}
+
   export interface BuildContext {
     options: Options;
     buildId: string;
