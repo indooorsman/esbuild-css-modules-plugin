@@ -1,3 +1,13 @@
+## V3.0.0
+This version has some breaking changes:
+- drop postcss-module, as a result most of postcss-module configurations are removed as well
+- remove `v2` feature flag
+
+Other changes:
+- full support of `compose`
+- code refactor
+- export both `commonjs` & `es` module
+
 ## V2.7.1
 - support esbuild@^0.17
 

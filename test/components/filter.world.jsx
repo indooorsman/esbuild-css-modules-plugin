@@ -1,6 +1,6 @@
 import React from 'react';
-import * as styles from '../styles/app-filter.css';
-import * as styles2 from '../styles/deep/styles/hello-filter.css';
+import styles from '../styles/app-filter.css';
+import styles2 from '../styles/deep/styles/hello-filter.css';
 
 export const HelloWorld = () => (
   <>

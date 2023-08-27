@@ -15,6 +15,7 @@
     "target": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
+    "allowArbitraryExtensions": true,
     "esModuleInterop": true
   },
   "include": [
