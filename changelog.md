@@ -1,3 +1,6 @@
+## V3.0.1
+- add ability to custom ts declaration file outdir
+
 ## V3.0.0
 This version has some breaking changes:
 - drop postcss-module, as a result most of postcss-module configurations are removed as well

@@ -1,5 +1,7 @@
 import type { Plugin, PluginBuild } from 'esbuild';
 
+declare type EmitDtsConfig = Partial<Record<'.d.css.ts' | '.css.d.ts' | '*', string>>;
+
 declare interface BuildOptions {
   /**
    * force to build css modules files even if `bundle` is disabled in esbuild
@@ -16,9 +18,19 @@ declare interface BuildOptions {
    * - `.css.d.ts` : emit `xxx.css.d.ts`
    * - `.d.css.ts` : emit `xxx.d.css.ts` (from typescript@5, see https://www.typescriptlang.org/tsconfig#allowArbitraryExtensions)
    * - `true` : emit both `xxx.css.d.ts` and `xxx.d.css.ts`
+   * by default the dts files would be generated in `outdir` of esbuild config, if you want to custom outdir of these dts files:
+   * ```js
+   * {
+   *   emitDeclarationFile: {
+   *     '*': 'custom/path/for/all',
+   *     '.css.d.ts': 'custom/path/for/*.css.d.ts',
+   *     '.d.css.ts': 'custom/path/for/*.d.css.ts'
+   *   }
+   * }
+   * ```
    * @default false
    */
-  emitDeclarationFile?: boolean | '.d.css.ts' | '.css.d.ts';
+  emitDeclarationFile?: boolean | '.d.css.ts' | '.css.d.ts' | EmitDtsConfig;
   /**
    * set to false to not inject generated css into page;
    * @description
@@ -98,6 +110,8 @@ declare interface BuildOptions {
 declare function CssModulesPlugin(options?: BuildOptions): Plugin;
 
 declare namespace CssModulesPlugin {
+  export type EmitDts = EmitDtsConfig;
+
   export interface Options extends BuildOptions {}
 
   export interface BuildContext {

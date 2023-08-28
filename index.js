@@ -105,16 +105,31 @@ export const setup = (build, _options) => {
     });
 
     if (emitDts) {
+      /** @type {('.d.css.ts'|'.css.d.ts')[]} */
       const dtsExts = [];
+      /** @type {import('./index.js').EmitDts} */
+      let outdirs = {};
       if (emitDts === '.d.css.ts' || emitDts === '.css.d.ts') {
         dtsExts.push(emitDts);
-      } else {
+      } else if (emitDts === true) {
         dtsExts.push('.d.css.ts', '.css.d.ts');
+      } else if (typeof emitDts === 'object') {
+        outdirs = { ...emitDts };
+        if (emitDts['*']) {
+          dtsExts.push('.d.css.ts', '.css.d.ts');
+        } else {
+          emitDts['.css.d.ts'] && dtsExts.push('.css.d.ts');
+          emitDts['.d.css.ts'] && dtsExts.push('.d.css.ts');
+        }
       }
       const outdir = resolve(buildRoot, patchedBuild.initialOptions.outdir ?? '');
       const outbase = patchedBuild.initialOptions.outbase;
       dtsExts.forEach(async (dtsExt) => {
         let outDtsfile = resolve(outdir, rpath).replace(/\.css$/i, dtsExt);
+        const dtsOutdir = outdirs[dtsExt] || outdirs['*'];
+        if (dtsOutdir) {
+          outDtsfile = resolve(buildRoot, dtsOutdir, rpath).replace(/\.css$/i, dtsExt);
+        }
         if (outbase) {
           let normalized = normalize(outbase);
           if (normalized.endsWith(sep)) {
@@ -248,13 +263,13 @@ export const setup = (build, _options) => {
       });
 
       await Promise.all([
-        ...(moduleJsFiles.map(([src, dist]) => {
+        ...moduleJsFiles.map(([src, dist]) => {
           const fp = resolve(buildRoot, dist);
           const filename = basename(src) + outJsExt;
           const finalPath = resolve(dirname(fp), filename);
           log(`rename ${dist} to ${filename}`);
           return rename(fp, finalPath);
-        })),
+        }),
         ...jsFiles.map(([js, places]) => {
           const fulljs = resolve(buildRoot, js);
           return readFile(fulljs, { encoding: 'utf8' })

@@ -108,7 +108,8 @@ import cssModulesPlugin from '../index.js';
     plugins: [
       cssModulesPlugin({
         inject: false,
-        namedExports: true
+        namedExports: true,
+        emitDeclarationFile: true
       })
     ],
     logLevel: 'debug'
@@ -133,7 +134,10 @@ import cssModulesPlugin from '../index.js';
     write: true,
     plugins: [
       cssModulesPlugin({
-        emitDeclarationFile: true,
+        emitDeclarationFile: {
+          '.css.d.ts': './dist/no-bundle',
+          '.d.css.ts': './generated-dts'
+        },
         force: true,
         forceInlineImages: true,
         inject: '#my-styles-container'
