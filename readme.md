@@ -3,13 +3,13 @@
 [![npm version](https://img.shields.io/npm/v/esbuild-css-modules-plugin)](https://www.npmjs.com/package/esbuild-css-modules-plugin)
 [![Test](https://github.com/indooorsman/esbuild-css-modules-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/indooorsman/esbuild-css-modules-plugin/actions/workflows/test.yml)
 
-A esbuild plugin to bundle css modules into js(x)/ts(x).
+A esbuild plugin to bundle css modules into js(x)/ts(x). Based on extremely fast [Lightning CSS](https://lightningcss.dev/)
 
 Works both with `bundle: false` and `bundle: true`.
 
 If build with `bundle: false`, `xxx.modules.css` will be transformed to `xxx.modules.css.js`.
 
-See [`./test/test.js`](https://github.com/indooorsman/esbuild-css-modules-plugin/blob/main/test/test.js) for examples.
+See [index.d.ts](https://github.com/indooorsman/esbuild-css-modules-plugin/blob/main/index.d.ts) for all settings & [`./test/test.js`](https://github.com/indooorsman/esbuild-css-modules-plugin/blob/main/test/test.js) for examples.
 
 ## Install
 

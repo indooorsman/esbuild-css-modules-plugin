@@ -1,7 +1,7 @@
 {
   "name": "esbuild-css-modules-plugin",
   "version": "3.0.1",
-  "description": "A esbuild plugin to bundle css modules into js(x)/ts(x).",
+  "description": "A esbuild plugin to bundle css modules into js(x)/ts(x), based on extremely fast [Lightning CSS](https://lightningcss.dev/)",
   "main": "./index.cjs",
   "module": "./index.js",
   "types": "./index.d.ts",
@@ -17,7 +17,11 @@
   "keywords": [
     "esbuild",
     "plugin",
+    "esbuildplugin",
+    "esbuild plugin",
     "css modules",
+    "fast",
+    "cssmodules",
     "lightningcss"
   ],
   "engines": {
