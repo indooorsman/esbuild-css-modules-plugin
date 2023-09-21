@@ -105,43 +105,47 @@ export const setup = (build, _options) => {
     });
 
     if (emitDts) {
-      /** @type {('.d.css.ts'|'.css.d.ts')[]} */
-      const dtsExts = [];
-      /** @type {import('./index.js').EmitDts} */
-      let outdirs = {};
-      if (emitDts === '.d.css.ts' || emitDts === '.css.d.ts') {
-        dtsExts.push(emitDts);
-      } else if (emitDts === true) {
-        dtsExts.push('.d.css.ts', '.css.d.ts');
-      } else if (typeof emitDts === 'object') {
-        outdirs = { ...emitDts };
-        if (emitDts['*']) {
+      if (rpath.startsWith('..')) {
+        log(`skip emit dts for file outside of build root:`, rpath);
+      } else {
+        /** @type {('.d.css.ts'|'.css.d.ts')[]} */
+        const dtsExts = [];
+        /** @type {import('./index.js').EmitDts} */
+        let outdirs = {};
+        if (emitDts === '.d.css.ts' || emitDts === '.css.d.ts') {
+          dtsExts.push(emitDts);
+        } else if (emitDts === true) {
           dtsExts.push('.d.css.ts', '.css.d.ts');
-        } else {
-          emitDts['.css.d.ts'] && dtsExts.push('.css.d.ts');
-          emitDts['.d.css.ts'] && dtsExts.push('.d.css.ts');
+        } else if (typeof emitDts === 'object') {
+          outdirs = { ...emitDts };
+          if (emitDts['*']) {
+            dtsExts.push('.d.css.ts', '.css.d.ts');
+          } else {
+            emitDts['.css.d.ts'] && dtsExts.push('.css.d.ts');
+            emitDts['.d.css.ts'] && dtsExts.push('.d.css.ts');
+          }
         }
+        const outdir = resolve(buildRoot, patchedBuild.initialOptions.outdir ?? '');
+        const outbase = patchedBuild.initialOptions.outbase;
+        dtsExts.forEach(async (dtsExt) => {
+          let outDtsfile = resolve(outdir, rpath).replace(/\.css$/i, dtsExt);
+          const dtsOutdir = outdirs[dtsExt] || outdirs['*'];
+          if (dtsOutdir) {
+            outDtsfile = resolve(buildRoot, dtsOutdir, rpath).replace(/\.css$/i, dtsExt);
+          }
+          if (outbase) {
+            let normalized = normalize(outbase);
+            if (normalized.endsWith(sep)) {
+              normalized = compact(normalized.split(sep)).join(sep);
+            }
+            if (normalized !== '.') {
+              outDtsfile = resolve(outDtsfile.replace(normalized, ''));
+            }
+          }
+          log(`emit dts:`, patchedBuild.context.relative(outDtsfile));
+          await ensureFile(outDtsfile, buildResult?.dts ?? '');
+        });
       }
-      const outdir = resolve(buildRoot, patchedBuild.initialOptions.outdir ?? '');
-      const outbase = patchedBuild.initialOptions.outbase;
-      dtsExts.forEach(async (dtsExt) => {
-        let outDtsfile = resolve(outdir, rpath).replace(/\.css$/i, dtsExt);
-        const dtsOutdir = outdirs[dtsExt] || outdirs['*'];
-        if (dtsOutdir) {
-          outDtsfile = resolve(buildRoot, dtsOutdir, rpath).replace(/\.css$/i, dtsExt);
-        }
-        if (outbase) {
-          let normalized = normalize(outbase);
-          if (normalized.endsWith(sep)) {
-            normalized = compact(normalized.split(sep)).join(sep);
-          }
-          if (normalized !== '.') {
-            outDtsfile = resolve(outDtsfile.replace(normalized, ''));
-          }
-        }
-        log(`emit typescript declarations file:`, patchedBuild.context.relative(outDtsfile));
-        await ensureFile(outDtsfile, buildResult?.dts ?? '');
-      });
     }
 
     if (!bundle && forceBuild) {

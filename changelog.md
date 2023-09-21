@@ -1,3 +1,6 @@
+## V3.0.2
+- Do not emit .d.ts for files outside of build root
+
 ## V3.0.1
 - add ability to custom ts declaration file outdir
 
