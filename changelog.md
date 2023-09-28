@@ -1,3 +1,6 @@
+## V3.0.3
+- Fix sourcemap
+
 ## V3.0.2
 - Do not emit .d.ts for files outside of build root
 
