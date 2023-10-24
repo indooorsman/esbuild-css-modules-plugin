@@ -22,7 +22,6 @@ import { patchContext } from './lib/context.js';
  * @param {import('./index.js').Options} _options
  */
 export const setup = (build, _options) => {
-  build.initialOptions.metafile = true;
   const options = _options || {};
   validateOptions(options);
 
