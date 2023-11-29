@@ -1,3 +1,9 @@
+## V3.1.0
+- fix [issue#61](https://github.com/indooorsman/esbuild-css-modules-plugin/issues/61)
+- fix [issue#59](https://github.com/indooorsman/esbuild-css-modules-plugin/issues/59)
+- do not modify user's configuration, throw warning if configuration is no valid for css modules plugin
+- support more options of `lightningcss`, see [index.d.ts](https://github.com/indooorsman/esbuild-css-modules-plugin/blob/main/index.d.ts) for details
+
 ## V3.0.3
 - Fix sourcemap
 

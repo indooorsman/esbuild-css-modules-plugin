@@ -1,8 +1,21 @@
 import type { Plugin, PluginBuild } from 'esbuild';
+import type { BundleOptions, CustomAtRules, TransformOptions } from 'lightningcss';
 
 declare type EmitDtsConfig = Partial<Record<'.d.css.ts' | '.css.d.ts' | '*', string>>;
 
-declare interface BuildOptions {
+declare interface BuildOptions
+  extends Partial<
+    Pick<
+      BundleOptions<CustomAtRules>,
+      | 'targets'
+      | 'drafts'
+      | 'nonStandard'
+      | 'pseudoClasses'
+      | 'errorRecovery'
+      | 'visitor'
+      | 'customAtRules'
+    >
+  > {
   /**
    * force to build css modules files even if `bundle` is disabled in esbuild
    * @default false
@@ -46,7 +59,7 @@ declare interface BuildOptions {
    * ```
    * the plugin will try to get `shadowRoot` of the found element, and append css to the
    * `shadowRoot`, if no shadowRoot then append to the found element, if no element found then append to `document.head`.
-   * 
+   *
    * could be a function with params content & digest (return a string of js code to inject css into page),
    * e.g.
    *
@@ -84,6 +97,16 @@ declare interface BuildOptions {
    * @default "camelCaseOnly"
    */
   localsConvention?: 'camelCase' | 'pascalCase' | 'camelCaseOnly' | 'pascalCaseOnly';
+  /** 
+   * Features that should always be compiled, even when supported by targets.
+   * @see https://lightningcss.dev/transpilation.html#feature-flags
+   */
+  featuresInclude?: BundleOptions<CustomAtRules>['include'];
+  /**
+   * Features that should never be compiled, even when unsupported by targets. 
+   * @see https://lightningcss.dev/transpilation.html#feature-flags
+   */
+  featuresExclude?: BundleOptions<CustomAtRules>['exclude'];
   /**
    * namedExports
    * e.g.:
