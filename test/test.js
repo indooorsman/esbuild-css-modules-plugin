@@ -148,4 +148,19 @@ import cssModulesPlugin from '../index.js';
 
   await esbuild.build(buildOptions);
   console.log('[test][esbuild:no:bundle] done, please check `test/dist/no-bundle`', '\n');
+
+  // testing no metafile & write false
+  const r = await esbuild.build({
+    ...buildOptions,
+    entryPoints: ['./app.jsx'],
+    bundle: true,
+    packages: 'external',
+    metafile: false,
+    write: false,
+    loader: {
+      '.jpg': 'file'
+    },
+    outdir: '__virtual_path__'
+  });
+  console.log('\nbuild result with metafile: false & write: false', r);
 })();

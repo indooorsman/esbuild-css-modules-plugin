@@ -22,7 +22,6 @@ import { patchContext } from './lib/context.js';
  * @param {import('./index.js').Options} _options
  */
 export const setup = (build, _options) => {
-  build.initialOptions.metafile = true;
   const options = _options || {};
   validateOptions(options);
 
@@ -40,6 +39,25 @@ export const setup = (build, _options) => {
   const outJsExt = patchedBuild.initialOptions.outExtension?.['.js'] ?? '.js';
   const forceInlineImages = !!options.forceInlineImages;
   const emitDts = options.emitDeclarationFile;
+
+  const warnMetafile = () => {
+    if (patchedBuild.initialOptions.metafile) {
+      return;
+    }
+    const warnings = patchedBuild.esbuild.formatMessagesSync(
+      [
+        {
+          text: '`metafile` is not enabled, it may not work properly, please consider to set `metafile` to true is your esbuild configuration.',
+          pluginName: pluginName
+        }
+      ],
+      {
+        kind: 'warning',
+        color: true
+      }
+    );
+    console.log(warnings.join('\n'));
+  }
 
   patchedBuild.onLoad({ filter: /.+/, namespace: pluginCssNamespace }, (args) => {
     const { path } = args;
@@ -245,6 +263,7 @@ export const setup = (build, _options) => {
       /** @type {[string, string][]} */
       const moduleJsFiles = [];
 
+      warnMetafile();
       Object.entries(r.metafile?.outputs ?? {}).forEach(([js, meta]) => {
         if (meta.entryPoint && modulesCssRegExp.test(meta.entryPoint)) {
           moduleJsFiles.push([meta.entryPoint, js]);
@@ -300,6 +319,7 @@ export const setup = (build, _options) => {
 
     /** @type {[string, string][]} */
     const filesToBuild = [];
+    warnMetafile();
     Object.entries(r.metafile?.outputs ?? {}).forEach(([outfile, meta]) => {
       if (meta.cssBundle) {
         filesToBuild.push([outfile, meta.cssBundle]);
