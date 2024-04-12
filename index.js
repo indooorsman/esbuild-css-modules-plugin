@@ -57,7 +57,7 @@ export const setup = (build, _options) => {
       }
     );
     console.log(warnings.join('\n'));
-  }
+  };
 
   patchedBuild.onLoad({ filter: /.+/, namespace: pluginCssNamespace }, (args) => {
     const { path } = args;
@@ -71,7 +71,7 @@ export const setup = (build, _options) => {
   });
 
   patchedBuild.onLoad(
-    { filter: new RegExp(`:${injectorVirtualPath}$`), namespace: pluginJsNamespace },
+    { filter: new RegExp(`^:.*${injectorVirtualPath}$`), namespace: pluginJsNamespace },
     (args) => {
       log(`[${pluginJsNamespace}] on load injector:`, args);
 
@@ -93,8 +93,8 @@ export const setup = (build, _options) => {
 
       /** @type {import('esbuild').OnResolveResult} */
       const r = { namespace: ns, path: originPath, pluginData: { ...(args.pluginData ?? {}) } };
-      if (originPath.endsWith(`:${injectorVirtualPath}`)) {
-        r.path = `:${injectorVirtualPath}`;
+      if (path.endsWith(`:${injectorVirtualPath}`)) {
+        r.path = path.replace(pluginJsNamespace, '');
       }
       log('resolved:', r);
 
@@ -320,9 +320,27 @@ export const setup = (build, _options) => {
     /** @type {[string, string][]} */
     const filesToBuild = [];
     warnMetafile();
+    const cssOutputsMap = Object.entries(r.metafile?.outputs ?? {}).reduce((m, [o, { inputs }]) => {
+      const keys = Object.keys(inputs);
+      if (keys.length === 1 && new RegExp(`^${pluginCssNamespace}:.+\.css$`).test(keys[0])) {
+        m[keys[0].replace(`${pluginCssNamespace}:`, '')] = o;
+      }
+      return m;
+    }, {});
     Object.entries(r.metafile?.outputs ?? {}).forEach(([outfile, meta]) => {
       if (meta.cssBundle) {
         filesToBuild.push([outfile, meta.cssBundle]);
+      } else {
+        const inputs = Object.keys(meta.inputs);
+        inputs.forEach((item) => {
+          if (item.endsWith(`:${injectorVirtualPath}`)) {
+            const sourceCss = item
+              .replace(pluginJsNamespace, '')
+              .replace(`:${injectorVirtualPath}`, '')
+              .replace(/^:+/, '');
+            filesToBuild.push([outfile, cssOutputsMap[sourceCss]]);
+          }
+        });
       }
     });
 
