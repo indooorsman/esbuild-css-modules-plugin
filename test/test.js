@@ -149,6 +149,29 @@ import cssModulesPlugin from '../index.js';
   await esbuild.build(buildOptions);
   console.log('[test][esbuild:no:bundle] done, please check `test/dist/no-bundle`', '\n');
 
+  await esbuild.build({
+    ...buildOptions,
+    entryPoints: [
+      './app.jsx',
+      './components/hello.world.jsx'
+    ],
+    splitting: true,
+    bundle: true,
+    packages: 'external',
+    outdir: './dist/bundle-splitting',
+    loader: {
+      '.jpg': 'file'
+    },
+    plugins: [
+      cssModulesPlugin({
+        inject: true
+      })
+    ],
+    logLevel: 'debug',
+    metafile: true
+  });
+  console.log('[test][esbuild:bundle:splitting] done, please check `test/dist/bundle-splitting`', '\n');
+
   // testing no metafile & write false
   const r = await esbuild.build({
     ...buildOptions,
