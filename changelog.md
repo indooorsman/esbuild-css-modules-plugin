@@ -1,3 +1,6 @@
+## V3.1.2
+- fix [issue#74](https://github.com/indooorsman/esbuild-css-modules-plugin/issues/74)
+
 ## V3.1.1
 - fix build with `bundle: true` & `splitting: true` & multiple entrypoints
 

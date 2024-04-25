@@ -354,13 +354,14 @@ export const setup = (build, _options) => {
           readFile(fullJsPath, { encoding: 'utf8' })
         ])
           .then(([css, js]) => {
+            const cssContent = simpleMinifyCss(css, patchedBuild.esbuild);
+            const digest = genDigest(c, buildId);
             const newJs = js
-              .replace(
-                contentPlaceholder,
-                JSON.stringify(simpleMinifyCss(css, patchedBuild.esbuild))
-              )
-              .replace(digestPlaceholder, JSON.stringify(genDigest(c, buildId)));
-            return newJs;
+              .replaceAll(contentPlaceholder, `globalThis['__css-content-${digest}__']`)
+              .replaceAll(digestPlaceholder, `globalThis['__css-digest-${digest}__']`);
+            return `globalThis['__css-content-${digest}__']=${JSON.stringify(
+              cssContent
+            )};globalThis['__css-digest-${digest}__']=${JSON.stringify(digest)};\n${newJs}`;
           })
           .then((newJs) => writeFile(fullJsPath, newJs, { encoding: 'utf8' }));
       })

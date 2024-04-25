@@ -22,6 +22,7 @@ import cssModulesPlugin from '../index.js';
         emitDeclarationFile: true
       })
     ],
+    metafile: true,
     logLevel: 'debug'
   });
   console.log('[test][esbuild:bundle:inject] done, please check `test/dist/bundle-inject`', '\n');
@@ -39,6 +40,7 @@ import cssModulesPlugin from '../index.js';
     external: ['react', 'react-dom'],
     outdir: './dist/bundle-custom-inject',
     write: true,
+    metafile: true,
     loader: {
       '.jpg': 'dataurl'
     },
@@ -86,7 +88,8 @@ import cssModulesPlugin from '../index.js';
         filter: /\.css$/i
       })
     ],
-    logLevel: 'debug'
+    logLevel: 'debug',
+    metafile: true
   });
   console.log('[test][esbuild:bundle:custom:filter] done, please check `test/dist/bundle-custom-filter`', '\n');
 
@@ -112,7 +115,8 @@ import cssModulesPlugin from '../index.js';
         emitDeclarationFile: true
       })
     ],
-    logLevel: 'debug'
+    logLevel: 'debug',
+    metafile: true
   });
   console.log('[test][esbuild:bundle:no:inject] done, please check `test/dist/bundle-no-inject`', '\n');
 
@@ -143,7 +147,8 @@ import cssModulesPlugin from '../index.js';
         inject: '#my-styles-container'
       })
     ],
-    logLevel: 'debug'
+    logLevel: 'debug',
+    metafile: true
   };
 
   await esbuild.build(buildOptions);
