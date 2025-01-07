@@ -1,7 +1,13 @@
 import type { Plugin, PluginBuild } from 'esbuild';
-import type { BundleOptions, CustomAtRules, TransformOptions } from 'lightningcss';
+import type {
+  BundleOptions,
+  CustomAtRules,
+  TransformOptions,
+} from 'lightningcss';
 
-declare type EmitDtsConfig = Partial<Record<'.d.css.ts' | '.css.d.ts' | '*', string>>;
+declare type EmitDtsConfig = Partial<
+  Record<'.d.css.ts' | '.css.d.ts' | '*', string>
+>;
 
 declare interface BuildOptions
   extends Partial<
@@ -96,14 +102,18 @@ declare interface BuildOptions
    * - **pascalCaseOnly**: `.some-class-name` ==> `SomeClassName`, the original class name will be removed from the locals
    * @default "camelCaseOnly"
    */
-  localsConvention?: 'camelCase' | 'pascalCase' | 'camelCaseOnly' | 'pascalCaseOnly';
-  /** 
+  localsConvention?:
+    | 'camelCase'
+    | 'pascalCase'
+    | 'camelCaseOnly'
+    | 'pascalCaseOnly';
+  /**
    * Features that should always be compiled, even when supported by targets.
    * @see https://lightningcss.dev/transpilation.html#feature-flags
    */
   featuresInclude?: BundleOptions<CustomAtRules>['include'];
   /**
-   * Features that should never be compiled, even when unsupported by targets. 
+   * Features that should never be compiled, even when unsupported by targets.
    * @see https://lightningcss.dev/transpilation.html#feature-flags
    */
   featuresExclude?: BundleOptions<CustomAtRules>['exclude'];
@@ -153,8 +163,8 @@ declare namespace CssModulesPlugin {
   export interface Build extends PluginBuild {
     context: BuildContext;
   }
-}
 
-export default CssModulesPlugin;
+  export default CssModulesPlugin;
+}
 
 export = CssModulesPlugin;
