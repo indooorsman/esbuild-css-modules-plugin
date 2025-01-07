@@ -148,11 +148,13 @@ declare namespace CssModulesPlugin {
     normalizedEntries: string[];
   }
 
-  export type setup = (build: PluginBuild, options: Options) => void;
+  export declare const setup: (build: PluginBuild, options: Options) => void;
 
   export interface Build extends PluginBuild {
     context: BuildContext;
   }
 }
+
+export default CssModulesPlugin;
 
 export = CssModulesPlugin;
