@@ -1,4 +1,5 @@
 .hello-text {
   composes: bg-red from "../../base.modules.css";
   color: grey;
+  grid-area: text;
 }

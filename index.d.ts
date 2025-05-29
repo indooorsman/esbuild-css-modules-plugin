@@ -2,7 +2,6 @@ import type { Plugin, PluginBuild } from 'esbuild';
 import type {
   BundleOptions,
   CustomAtRules,
-  TransformOptions,
 } from 'lightningcss';
 
 declare type EmitDtsConfig = Partial<
@@ -138,6 +137,36 @@ declare interface BuildOptions
     module?: string;
     version: string;
   };
+  /**
+   * Enforces usage of one or more id or class selectors for each rule.
+   *
+   * If you enable this option, Lightning CSS will throw an error for CSS rules
+   * that don't have at least one id or class selector, like div. This is useful
+   * because selectors like div are not scoped and affects all elements on the
+   * page.
+   *
+   * https://lightningcss.dev/css-modules.html#pure-mode
+   */
+  pure?: boolean;
+  /**
+   * Turn off feature scoping for animations;
+   *
+   * https://lightningcss.dev/css-modules.html#turning-off-feature-scoping
+   */
+  animation?: boolean;
+  /**
+   * Turn off feature scoping for custom idents:
+   * https://developer.mozilla.org/en-US/docs/Web/CSS/custom-ident;
+   *
+   * https://lightningcss.dev/css-modules.html#turning-off-feature-scoping
+   */
+  customIdents?: boolean;
+  /**
+   * Turn off feature scoping for grid areas;
+   *
+   * https://lightningcss.dev/css-modules.html#turning-off-feature-scoping
+   */
+  grid?: boolean;
 }
 
 declare function CssModulesPlugin(options?: BuildOptions): Plugin;

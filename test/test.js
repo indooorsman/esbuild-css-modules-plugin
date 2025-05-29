@@ -19,7 +19,8 @@ import cssModulesPlugin from '../index.js';
     plugins: [
       cssModulesPlugin({
         inject: '#my-custom-element-with-shadow-dom',
-        emitDeclarationFile: true
+        emitDeclarationFile: true,
+        pattern: "__[hash]_[local]"
       })
     ],
     metafile: true,
@@ -56,7 +57,8 @@ import cssModulesPlugin from '../index.js';
             document.head.appendChild(styleEle);
           }
         `;
-        }
+        },
+        pattern: "__[hash]_[local]"
       })
     ],
     logLevel: 'debug'
@@ -85,7 +87,9 @@ import cssModulesPlugin from '../index.js';
       cssModulesPlugin({
         inject: false,
         namedExports: true,
-        filter: /\.css$/i
+        filter: /\.css$/i,
+        pattern: "__[hash]_[local]"
+
       })
     ],
     logLevel: 'debug',
@@ -112,7 +116,8 @@ import cssModulesPlugin from '../index.js';
       cssModulesPlugin({
         inject: false,
         namedExports: true,
-        emitDeclarationFile: true
+        emitDeclarationFile: true,
+        pattern: "__[hash]_[local]"
       })
     ],
     logLevel: 'debug',
@@ -144,7 +149,8 @@ import cssModulesPlugin from '../index.js';
         },
         force: true,
         forceInlineImages: true,
-        inject: '#my-styles-container'
+        inject: '#my-styles-container',
+        pattern: "__[hash]_[local]"
       })
     ],
     logLevel: 'debug',
@@ -169,13 +175,71 @@ import cssModulesPlugin from '../index.js';
     },
     plugins: [
       cssModulesPlugin({
-        inject: true
+        inject: true,
+        pattern: "__[hash]_[local]"
       })
     ],
     logLevel: 'debug',
     metafile: true
   });
   console.log('[test][esbuild:bundle:splitting] done, please check `test/dist/bundle-splitting`', '\n');
+
+  try {
+    // testing pure: true
+    await esbuild.build({
+      entryPoints: ['app.jsx'],
+      entryNames: '[name]-[hash]',
+      format: 'esm',
+      target: ['esnext'],
+      bundle: true,
+      minify: false,
+      publicPath: 'https://my.domain/static/',
+      external: ['react', 'react-dom'],
+      outdir: './dist/pure',
+      write: true,
+      loader: {
+        '.jpg': 'file'
+      },
+      plugins: [
+        cssModulesPlugin({
+          pure: true,
+          pattern: "__[hash]_[local]"
+        })
+      ],
+      metafile: true,
+      logLevel: 'debug'
+    });
+  } catch (error) {
+    console.log('Should result in " [ERROR] A selector in CSS modules should contain at least one class or ID selector [plugin esbuild-css-modules-plugin]"`', '\n');
+  }
+
+  // testing feature scoping
+  await esbuild.build({
+    entryPoints: ['app.jsx'],
+    entryNames: '[name]-[hash]',
+    format: 'esm',
+    target: ['esnext'],
+    bundle: true,
+    minify: false,
+    publicPath: 'https://my.domain/static/',
+    external: ['react', 'react-dom'],
+    outdir: './dist/feature-scoping',
+    write: true,
+    loader: {
+      '.jpg': 'file'
+    },
+    plugins: [
+      cssModulesPlugin({
+        animation: false,
+        customIdents: false,
+        grid: false,
+        pattern: "__[hash]_[local]"
+      })
+    ],
+    metafile: true,
+    logLevel: 'debug'
+  });
+  console.log('Should result in " [ERROR] A selector in CSS modules should contain at least one class or ID selector [plugin esbuild-css-modules-plugin]"`', '\n');
 
   // testing no metafile & write false
   const r = await esbuild.build({
