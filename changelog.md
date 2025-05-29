@@ -1,4 +1,7 @@
-## V3.1.2
+## V3.1.5
+- fix [issue#75](https://github.com/indooorsman/esbuild-css-modules-plugin/issues/75)
+
+- ## V3.1.2
 - fix [issue#74](https://github.com/indooorsman/esbuild-css-modules-plugin/issues/74)
 
 ## V3.1.1

@@ -3,10 +3,15 @@
 .hello_world {
   color: red;
   background: url("../components/world.jpg");
+
+  animation: 3s linear slide-in;
+  display: grid;
+  grid-template: "image text";
 }
 
 .hello-world img {
   display: inline-block;
+  grid-area: image;
 }
 
 .hello-world:hover {
@@ -15,4 +20,18 @@
 
 .some-other-selector {
   background-image: url('../components/world.jpg');
+}
+
+/* Should throw an error when `pure: true` */
+div {
+  border-radius: 20px;
+}
+
+@keyframes slide-in {
+  from {
+    margin-left: -20%;
+  }
+  to {
+    margin-left: 100%;
+  }
 }

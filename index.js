@@ -112,7 +112,7 @@ export const setup = (build, _options) => {
     const rpath = relative(buildRoot, path);
     const prefix = basename(rpath, extname(path))
       .replace(/[^a-zA-Z0-9]/g, '-')
-      .replace(/^\-*/, '');
+      .replace(/^-*/, '');
     const suffix = patchedBuild.context.packageVersion?.replace(/[^a-zA-Z0-9]/g, '') ?? '';
 
     const buildResult = CSSTransformer.getInstance(patchedBuild).bundle(path, {
@@ -320,7 +320,9 @@ export const setup = (build, _options) => {
     /** @type {[string, string][]} */
     const filesToBuild = [];
     warnMetafile();
-    const cssOutputsMap = Object.entries(r.metafile?.outputs ?? {}).reduce((m, [o, { inputs }]) => {
+
+    const cssOutputsMap = Object.entries(r.metafile?.outputs ?? {})
+        .reduce(/** @type {(m: Record<string, string>, o: any) => Record<string, string>} */(m, [o, {inputs}]) => {
       const keys = Object.keys(inputs);
       if (keys.length === 1 && new RegExp(`^${pluginCssNamespace}:.+\.css$`).test(keys[0])) {
         m[keys[0].replace(`${pluginCssNamespace}:`, '')] = o;
